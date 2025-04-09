@@ -1,4 +1,3 @@
-// SmartAssistant.jsx
 import { useState, useRef, useEffect } from 'react';
 import { DraggableCore } from 'react-draggable';
 import { Resizable } from 're-resizable';
@@ -31,12 +30,17 @@ const SmartAssistant = () => {
   const [scale, setScale] = useState(1);
   const offset = useRef({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const positionRef = useRef(position);
   const dragStartPosition = useRef({ x: 0, y: 0 });
 
   const clampPosition = (x, y) => ({
     x: Math.max(10, Math.min(x, window.innerWidth - 50)),
     y: Math.max(10, Math.min(y, window.innerHeight - 50))
   });
+
+  useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -49,6 +53,10 @@ const SmartAssistant = () => {
   const handleDragStart = (e, data) => {
     if (e.type === 'mousedown' && e.button !== 0) return;
     
+    // 立即更新DOM位置
+    dragRef.current.style.transform = `translate(${positionRef.current.x}px, ${positionRef.current.y}px)`;
+    dragRef.current.style.transition = 'none';
+    
     const rect = e.target.getBoundingClientRect();
     offset.current = {
       x: e.clientX - rect.left,
@@ -60,15 +68,21 @@ const SmartAssistant = () => {
     document.body.style.cursor = 'grabbing';
     document.body.style.userSelect = 'none';
     e.preventDefault();
-    e.stopPropagation();
   };
 
   const handleDrag = (e, data) => {
     if (!isDragging) return;
     
-    const newX = e.clientX - offset.current.x;
-    const newY = e.clientY - offset.current.y;
-    setPosition(clampPosition(newX, newY));
+    requestAnimationFrame(() => {
+      const newX = e.clientX - offset.current.x;
+      const newY = e.clientY - offset.current.y;
+      
+      // 直接操作DOM实现即时更新
+      dragRef.current.style.transform = `translate(${newX}px, ${newY}px)`;
+      
+      // 异步更新状态用于边界检测
+      setPosition(clampPosition(newX, newY));
+    });
   };
 
   const handleDragEnd = () => {
@@ -76,7 +90,11 @@ const SmartAssistant = () => {
     document.body.style.cursor = 'default';
     document.body.style.userSelect = 'auto';
     
-    const { x, y } = position;
+    // 恢复过渡效果
+    dragRef.current.style.transition = 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+    
+    // 边界检测
+    const { x, y } = positionRef.current;
     const threshold = 50;
     if (
       x < -threshold || 
@@ -84,10 +102,12 @@ const SmartAssistant = () => {
       y < -threshold ||
       y > window.innerHeight + threshold
     ) {
-      setPosition(clampPosition(
+      const newPos = clampPosition(
         Math.max(0, Math.min(x, window.innerWidth - 100)),
         Math.max(0, Math.min(y, window.innerHeight - 100))
-      ));
+      );
+      setPosition(newPos);
+      dragRef.current.style.transform = `translate(${newPos.x}px, ${newPos.y}px)`;
     }
   };
 
@@ -138,7 +158,7 @@ const SmartAssistant = () => {
               position: 'fixed',
               cursor: isDragging ? 'grabbing' : 'grab',
               zIndex: 10000,
-              transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
+              transition: 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
             }}
             onClick={(e) => {
               const dx = Math.abs(e.clientX - dragStartPosition.current.x);
