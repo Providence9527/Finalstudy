@@ -1,0 +1,48 @@
+.data-card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px; /* 设置透视效果 */
+  height: 100vh; /* 可根据需要调整 */
+}
+
+.window {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.small-window {
+  width: 200px; /* 小窗口宽度 */
+  height: 150px; /* 小窗口高度 */
+  transform: rotateY(45deg); /* 旋转以创建立体效果 */
+}
+
+.large-window {
+  width: 300px; /* 大窗口宽度 */
+  height: 225px; /* 大窗口高度 */
+  transform: translateZ(50px); /* 向前移动以突出显示 */
+}
+
+.window-content {
+  text-align: center;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

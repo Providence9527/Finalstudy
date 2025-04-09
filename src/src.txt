@@ -1,0 +1,568 @@
+ 
+ 
+ 
+// src/components/MaterialCard.jsx
+import { useState } from 'react';
+import { 
+  Button, Card, CardContent, CardMedia, Typography, Chip, Rating, 
+  Divider, Stack, Grid, Box, Dialog, DialogTitle, DialogContent, DialogActions,
+  useMediaQuery 
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
+import { useAuth } from '../contexts/AuthContext';
+import { addToBookshelf } from '../api/learning';
+
+export default function MaterialCard({ material }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showReaderDialog, setShowReaderDialog] = useState(false);
+
+  const handleRead = () => {
+    const availableFormats = material.formats || [];
+    if (!availableFormats.length) {
+      console.error('无可用文件格式', material);
+      alert('该书籍暂无可用阅读资源');
+      return;
+    }
+
+    if (availableFormats.includes('pdf')) {
+      setShowReaderDialog(true);
+    } else {
+      navigate(`/book/${material._id}`);
+    }
+  };
+
+  const handleReaderChoice = (readerType) => {
+    navigate(`/book/${material._id}?reader=${readerType}`);
+    setShowReaderDialog(false);
+  };
+
+  return (
+    <>
+      <Card sx={{ 
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        transition: '0.3s',
+        '&:hover': { 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)', 
+          transform: 'translateX(-2px)' 
+        },
+        minHeight: 200,
+        mb: 2,
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* 封面图片 */}
+        <CardMedia
+          component="img"
+          sx={{ 
+            width: { xs: '100%', sm: 200 },
+            height: { xs: 220, sm: '100%' },
+            objectFit: 'cover',
+            flexShrink: 0
+          }}
+          image={material.thumbnail_url}
+          alt={material.book_title}
+          onError={(e) => {
+            if (!e.target.src.endsWith('/default-book.jpg')) {
+              e.target.src = '/default-book.jpg';
+            }
+          }}
+        />
+
+        {/* 主内容容器 */}
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0, // 防止内容溢出
+          position: 'relative'
+        }}>
+          <CardContent sx={{ 
+            flex: 1,
+            p: { xs: 2, sm: 2.5 },
+            '&:last-child': { pb: 2.5 }
+          }}>
+            {/* 标题和评分 */}
+            <Stack direction="row" justifyContent="space-between" sx={{ mb: 1.5 }}>
+              <Typography variant="h6" sx={{
+                fontSize: { xs: '1.1rem', sm: '1.2rem' },
+                fontWeight: 600,
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
+              }}>
+                {material.book_title}
+              </Typography>
+              <Rating 
+                value={material.rating || 0} 
+                precision={0.5} 
+                readOnly 
+                size={isMobile ? 'small' : 'medium'}
+                sx={{ ml: 1 }}
+              />
+            </Stack>
+
+            {/* 书籍信息 */}
+            <Stack spacing={0.5} sx={{ mb: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                作者：{material.author || '未知作者'}
+              </Typography>
+              {material.press && (
+                <Typography variant="body2" color="text.secondary">
+                  出版社：{material.press}
+                </Typography>
+              )}
+            </Stack>
+
+            <Divider sx={{ mb: 2 }} />
+
+            {/* 标签和格式 */}
+            <Grid container spacing={1}>
+              {material.book_tags?.map((tag) => (
+                <Grid item key={`tag-${tag}-${material._id}`}>
+                  <Chip 
+                    label={tag}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    sx={{ fontSize: '0.75rem' }}
+                  />
+                </Grid>
+              ))}
+              {material.formats?.map((format) => (
+                <Grid item key={`format-${format}-${material._id}`}>
+                  <Chip 
+                    label={format.toUpperCase()}
+                    size="small"
+                    sx={{ 
+                      fontSize: '0.75rem',
+                      backgroundColor: 'grey.100',
+                      textTransform: 'uppercase'
+                    }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+
+          {/* 操作按钮容器 */}
+          <Box sx={{ 
+            p: 2,
+            pt: 0,
+            display: 'flex',
+            gap: 1.5,
+            flexWrap: 'wrap',
+            justifyContent: { xs: 'center', sm: 'flex-end' },
+            borderTop: { xs: '1px solid', sm: 'none' },
+            borderColor: { xs: 'divider', sm: 'transparent' },
+            mt: 'auto'
+          }}>
+            <Button 
+              variant="contained" 
+              size={isMobile ? 'small' : 'medium'}
+              sx={{ 
+                minWidth: 120,
+                flex: { xs: '1 1 100%', sm: '0 0 auto' },
+                maxWidth: { xs: 'none', sm: 120 }
+              }}
+              onClick={handleRead}
+            >
+              立即阅读
+            </Button>
+            <Button
+              variant="outlined"
+              size={isMobile ? 'small' : 'medium'}
+              sx={{ 
+                minWidth: 120,
+                flex: { xs: '1 1 100%', sm: '0 0 auto' },
+                maxWidth: { xs: 'none', sm: 120 },
+                borderWidth: 2
+              }}
+              onClick={async () => {
+                try {
+                  if (!user) {
+                    alert('请先登录');
+                    return;
+                  }
+                  await addToBookshelf({
+                    userId: user._id,
+                    materialId: material._id
+                  });
+                  alert('已成功加入书架');
+                } catch (error) {
+                  console.error('加入书架失败:', error);
+                  alert(`操作失败: ${error.message.substring(0, 50)}`);
+                }
+              }}
+            >
+              加入书架
+            </Button>
+          </Box>
+        </Box>
+      </Card>
+
+      {/* PDF阅读器选择对话框 */}
+      <Dialog open={showReaderDialog} onClose={() => setShowReaderDialog(false)}>
+        <DialogTitle>选择阅读方式</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">请选择PDF阅读方式：</Typography>
+        </DialogContent>
+        <DialogActions sx={{ 
+          p: 2, 
+          gap: 2,
+          flexWrap: 'nowrap',
+          justifyContent: 'center'
+        }}>
+          <Button 
+            variant="outlined"
+            onClick={() => handleReaderChoice('pdfjs')}
+            sx={{ 
+              flex: '1 1 auto',
+              minWidth: 'max-content',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            高级模式（PDF.js）
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => handleReaderChoice('embedded')}
+            sx={{ 
+              flex: '1 1 auto',
+              minWidth: 'max-content',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            快速模式（内置阅读器）
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+import { useState } from 'react'
+import SearchBox from '../components/SearchBox'
+import BookCard from '../components/BookCard'
+import LastViewedCard from '../components/LastViewedCard'
+import CustomFolders from '../components/CustomFolders'
+import ImportButton from '../components/ImportButton'
+import { materials as initialMaterials } from '../data/materials'
+import '../styles/main.css'
+
+const Diy = () => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedFolder, setSelectedFolder] = useState(null)
+  const [lastViewed, setLastViewed] = useState(initialMaterials[0])
+  const [localMaterials, setLocalMaterials] = useState(initialMaterials)
+
+  const handleImportLocal = (file) => {
+    const newMaterial = {
+      id: Date.now(),
+      title: file.name,
+      description: `本地文件: ${file.type}`,
+      subjects: ['local'],
+      fileSize: file.size,
+      lastAccessed: new Date().toISOString()
+    }
+    setLocalMaterials(prev => [...prev, newMaterial])
+    setLastViewed(newMaterial)
+  }
+
+  const handleImportURL = (url) => {
+    const newMaterial = {
+      id: Date.now(),
+      title: `网络资源: ${url.substring(0, 25)}...`,
+      description: `来自: ${new URL(url).hostname}`,
+      subjects: ['web'],
+      url: url,
+      lastAccessed: new Date().toISOString()
+    }
+    setLocalMaterials(prev => [...prev, newMaterial])
+    setLastViewed(newMaterial)
+  }
+
+  const filteredMaterials = localMaterials.filter(material => {
+    const searchMatch = material.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const folderMatch = !selectedFolder || 
+      (material.subjects && material.subjects.includes(selectedFolder))
+    return searchMatch && folderMatch
+  })
+
+  return (
+    <div className="diy-layout">
+      <div className="left-panel">
+        <SearchBox 
+          onSearch={(term) => setSearchTerm(term)}
+          placeholder="搜索教材..."
+        />
+        <CustomFolders 
+          selectedFolder={selectedFolder}
+          onSelectFolder={(folderId) => setSelectedFolder(folderId)}
+        />
+      </div>
+
+      <div className="right-panel">
+        <div className="panel-header">
+          <div className="last-viewed-container">
+            <LastViewedCard item={lastViewed} />
+          </div>
+          <div className="floating-import-container">
+            <ImportButton 
+              onImportLocal={handleImportLocal}
+              onImportURL={handleImportURL}
+            />
+          </div>
+        </div>
+        
+        <div className="results-grid">
+          {filteredMaterials.length > 0 ? (
+            filteredMaterials.map(material => (
+              <BookCard
+                key={material.id}
+                material={material}
+                onClick={() => setLastViewed(material)}
+              />
+            ))
+          ) : (
+            <div className="empty-state">
+              <p>没有找到匹配的教材</p>
+              <button 
+                className="import-here"
+                onClick={() => document.querySelector('.import-toggle')?.click()}
+              >
+                立即导入
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Diy 
+ 
+ 
+// src/api/learning.js
+import axios from 'axios';
+//import { useAuth } from '../contexts/AuthContext';
+
+
+// 原有统计接口
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
+  return response.json();
+};
+
+export const fetchLearningStats = async (userId) => {
+  const response = await fetch(`/api/users/${userId}/stats`);
+  return handleResponse(response);
+};
+
+export const fetchOngoingCourses = async (userId) => {
+  const response = await fetch(`/api/users/${userId}/progress?status=ongoing`);
+  const { data } = await handleResponse(response);
+  return data;
+};
+
+export const fetchRecommendations = async (userId) => {
+  const response = await fetch(`/api/users/${userId}/recommendations`);
+  const { data } = await handleResponse(response);
+  return data;
+};
+
+export const createAuthHeaders = (token) => ({
+  headers: {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+
+
+// 获取用户所有对话列表
+const axiosInstance = axios.create({
+  baseURL: '/api'
+});
+
+// 统一请求头配置
+const createHeaders = () => ({
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// 获取对话列表
+export const fetchConversations = async (userId) => {
+  
+  const response = await axiosInstance.get(
+    `/users/${userId}/conversations/`,
+    createHeaders()
+  );
+  //////console.log(`/users/${userId}/conversations/`)
+  return response.data.data.map(conv => ({
+    id: conv.conversation_id,
+    title: conv.title,
+    created_at: conv.created_at,
+    updated_at: conv.last_updated
+  }));
+};
+
+// 获取对话消息
+export const fetchConversationMessages = async (userId, conversationId) => {
+  //console.log("加载信息",`/users/${userId}/conversations/${conversationId}/messages/`)
+  const response = await axiosInstance.get(
+    `/users/${userId}/conversations/${conversationId}/messages/`,
+    createHeaders()
+  );
+  //console.log("数据:  ",response.data)
+  return response.data.messages.map(msg => ({
+    text: msg.content,
+    isAI: msg.role === 'assistant',
+    timestamp: msg.timestamp
+  }));
+};
+
+// 保存对话消息
+export const saveConversationMessages = async (userId, conversationId, messages) => {
+  const formattedMessages = messages.map(msg => ({
+    content: msg.text,
+    role: msg.isAI ? 'assistant' : 'user',
+    timestamp: msg.timestamp || new Date().toISOString()
+  }));
+  
+  await axiosInstance.put(
+    `/users/${userId}/conversations/${conversationId}/messages/`,
+    { messages: formattedMessages },
+    createHeaders()
+  );
+};
+
+// 创建新对话
+export const createConversation = async (userId, firstMessage) => {
+  const response = await axiosInstance.post(
+    `/users/${userId}/conversations/`,
+    { first_message: firstMessage },
+    createHeaders()
+  );
+  return {
+    id: response.data.conversation_id,
+    title: response.data.title,
+    created_at: response.data.created_at,
+    updated_at: response.data.last_updated
+  };
+};
+
+export const deleteConversation = async (userId, conversationId) => {
+  await axiosInstance.delete(
+    `/users/${userId}/conversations/${conversationId}/`,
+    createHeaders()
+  );
+};
+
+// 书籍筛选api接口
+const ITEMS_PER_PAGE = 12;
+export const fetchMaterials = async (params = {}) => {
+  const query = new URLSearchParams({
+    page: params.page || 1,
+    page_size: params.page_size || ITEMS_PER_PAGE,
+    search: params.search || '',
+    subjects: params.subjects?.join(',') || '',
+    publishers: params.publishers?.join(',') || '',
+    formats: params.formats?.join(',') || '',
+    tags: params.tags?.join(',') || '',
+
+  }).toString();
+
+  const response = await fetch(`/api/materials/?${query}`);
+  const { data, pagination } = await handleResponse(response);
+  return { data, pagination };
+};
+
+export const fetchFilterOptions = async () => {
+  const response = await fetch('/api/materials/filter-options/');
+  return handleResponse(response);
+};
+
+
+// 书籍阅览api接口
+export const addToBookshelf = async ({ userId, materialId }) => {
+  const response = await fetch(`/api/users/${userId}/bookshelf`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      // 需添加认证头
+      Authorization: `Bearer ${localStorage.getItem('token')}` 
+    },
+    body: JSON.stringify({ material_id: materialId })
+  });
+  
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+  return response.json();
+};
+
+export const fetchBookContent = async (id) => {
+  // console.log('[API] 请求书籍内容 ID:', id);
+  const response = await fetch(`/api/books/${id}/content/`, {
+  });
+
+     // 统一读取响应数据
+     const responseData = await response.json()
+     .catch(error => {
+       console.error('[API] 响应解析失败', error);
+       throw new Error('无效的服务器响应格式');
+     });
+ 
+   // 调试信息统一记录
+  //  console.debug('[API] 完整响应', {
+  //    status: response.status,
+  //    headers: Object.fromEntries(response.headers.entries()),
+  //    data: responseData
+  //  });
+ 
+   if (response.ok) {
+     // 统一数据校验
+     if (!responseData.type || !responseData.url) {
+       throw new Error('服务器返回了无效的数据格式');
+     }
+     return responseData;
+   }
+  //  console.log('[API] 有效响应数据:', responseData);
+   throw new Error(responseData.error || '未知错误'); 
+};
+
+export const detectFileType = async (url) => {
+   const response = await fetch(url, { method: 'HEAD' });
+   return response.headers.get('Content-Type');
+ }; 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
