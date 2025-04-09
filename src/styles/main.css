@@ -1225,3 +1225,96 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* main.css */
+.assistant-window {
+  will-change: transform;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  overflow: hidden;
+}
+
+.floating-ball {
+  width: 50px;
+  height: 50px;
+  background: #2196f3;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.3);
+  user-select: none;
+}
+
+.window-header {
+  padding: 12px;
+  background: rgba(33,150,243,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab {
+  padding: 8px 16px;
+  border: none;
+  background: rgba(0,0,0,0.05);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.tab.active {
+  background: #2196f3;
+  color: white;
+}
+
+.close-tab {
+  margin-left: 8px;
+  padding: 2px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.close-tab:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.settings-panel {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mode-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.opacity-control {
+  padding: 16px 0;
+}
+
+.window-content {
+  overflow: hidden;
+  transform-origin: 0 0;
+}

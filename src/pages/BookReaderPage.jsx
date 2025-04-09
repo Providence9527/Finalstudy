@@ -1,3 +1,4 @@
+// BookReaderPage.jsx
 import { useState, useEffect } from 'react';
 import { 
   useParams, useNavigate, useSearchParams 
@@ -69,11 +70,10 @@ export default function BookReaderPage() {
     loadContent();
   }, [id]);
 
-  // 处理应用高度
   useEffect(() => {
     const setAppHeight = () => {
       document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-    }
+    };
     window.addEventListener('resize', setAppHeight);
     setAppHeight();
     return () => window.removeEventListener('resize', setAppHeight);
@@ -136,9 +136,11 @@ export default function BookReaderPage() {
       height: 'var(--app-height, 100vh)',
       position: 'relative',
       overflow: 'hidden',
-      isolation: 'isolate'
+      isolation: 'isolate',
+      '& *': {
+        touchAction: 'manipulation'
+      }
     }}>
-      {/* 智能助手组件 */}
       <Box sx={{ 
         position: 'fixed',
         zIndex: 10001,
@@ -147,12 +149,14 @@ export default function BookReaderPage() {
         right: 0,
         bottom: 0,
         pointerEvents: 'none',
-        '& > *': { pointerEvents: 'auto' }
+        '& > *': { 
+          pointerEvents: 'auto',
+          touchAction: 'none'
+        }
       }}>
         <SmartAssistant />
       </Box>
 
-      {/* 关闭按钮 */}
       <IconButton
         sx={{ 
           position: 'absolute',
@@ -167,7 +171,6 @@ export default function BookReaderPage() {
         <CloseIcon fontSize="large" />
       </IconButton>
 
-      {/* 错误状态显示 */}
       {state.error ? (
         <Box sx={{ 
           display: 'flex',
@@ -182,7 +185,6 @@ export default function BookReaderPage() {
           <Typography variant="body2">{state.error}</Typography>
         </Box>
       ) : (
-       
         <Box sx={{
           position: 'relative',
           zIndex: 9999,
@@ -190,7 +192,8 @@ export default function BookReaderPage() {
           width: '100%',
           '& > *': {
             height: '100%',
-            width: '100%'
+            width: '100%',
+            touchAction: 'pan-y'
           }
         }}>
           {state.content.type === 'pdf' && (
@@ -222,7 +225,6 @@ export default function BookReaderPage() {
         </Box>
       )}
 
-      {/* PDF回退对话框 */}
       <Dialog open={showFallbackDialog} onClose={() => setShowFallbackDialog(false)}>
         <DialogTitle>PDF加载失败</DialogTitle>
         <DialogContent>

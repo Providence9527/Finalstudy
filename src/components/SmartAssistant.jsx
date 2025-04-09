@@ -1,3 +1,4 @@
+// SmartAssistant.jsx
 import { useState, useRef, useEffect } from 'react';
 import { DraggableCore } from 'react-draggable';
 import { Resizable } from 're-resizable';
@@ -28,15 +29,15 @@ const SmartAssistant = () => {
   });
   const [visibleTabs, setVisibleTabs] = useState(new Set());
   const [scale, setScale] = useState(1);
-  const [dragStartPosition, setDragStartPosition] = useState({ x: 0, y: 0 });
+  const offset = useRef({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartPosition = useRef({ x: 0, y: 0 });
 
-  // 窗口边界限制
   const clampPosition = (x, y) => ({
     x: Math.max(10, Math.min(x, window.innerWidth - 50)),
     y: Math.max(10, Math.min(y, window.innerHeight - 50))
   });
 
-  // 视口尺寸监听
   useEffect(() => {
     const handleResize = () => {
       setPosition(prev => clampPosition(prev.x, prev.y));
@@ -45,22 +46,51 @@ const SmartAssistant = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // 拖拽处理
-  const handleDrag = (_, data) => {
-    const newX = position.x + data.deltaX;
-    const newY = position.y + data.deltaY;
-    const newPos = clampPosition(newX, newY);
-    setPosition(newPos);
-  };
-
   const handleDragStart = (e, data) => {
+    if (e.type === 'mousedown' && e.button !== 0) return;
+    
+    const rect = e.target.getBoundingClientRect();
+    offset.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+    
+    setIsDragging(true);
+    dragStartPosition.current = { x: e.clientX, y: e.clientY };
+    document.body.style.cursor = 'grabbing';
+    document.body.style.userSelect = 'none';
     e.preventDefault();
     e.stopPropagation();
-    
-    setDragStartPosition({ x: data.x, y: data.y });
   };
 
-  // 尺寸调整
+  const handleDrag = (e, data) => {
+    if (!isDragging) return;
+    
+    const newX = e.clientX - offset.current.x;
+    const newY = e.clientY - offset.current.y;
+    setPosition(clampPosition(newX, newY));
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+    
+    const { x, y } = position;
+    const threshold = 50;
+    if (
+      x < -threshold || 
+      x > window.innerWidth + threshold ||
+      y < -threshold ||
+      y > window.innerHeight + threshold
+    ) {
+      setPosition(clampPosition(
+        Math.max(0, Math.min(x, window.innerWidth - 100)),
+        Math.max(0, Math.min(y, window.innerHeight - 100))
+      ));
+    }
+  };
+
   const handleResize = (e, direction, ref, delta) => {
     const newWidth = size.width + delta.width;
     const newHeight = size.height + delta.height;
@@ -71,7 +101,6 @@ const SmartAssistant = () => {
     setSize({ width: validWidth, height: validHeight });
   };
 
-  // 模式切换
   const toggleMode = (modeKey) => {
     setModes(prev => {
       const newState = !prev[modeKey];
@@ -84,13 +113,10 @@ const SmartAssistant = () => {
     });
   };
 
-  // 生成标签页
-  const generateTabs = () => {
-    return [
-      { id: 'settings', label: '模式设置', component: null },
-      ...Array.from(visibleTabs).map(modeKey => MODE_TABS[modeKey])
-    ];
-  };
+  const generateTabs = () => [
+    { id: 'settings', label: '模式设置', component: null },
+    ...Array.from(visibleTabs).map(modeKey => MODE_TABS[modeKey])
+  ];
 
   return (
     <div className="smart-assistant-container">
@@ -99,28 +125,26 @@ const SmartAssistant = () => {
           nodeRef={dragRef}
           onStart={handleDragStart}
           onDrag={handleDrag}
+          onStop={handleDragEnd}
           bounds="parent"
+          enableUserSelectHack={false}
         >
           <div
             ref={dragRef}
             className="floating-ball"
             style={{ 
               transform: `translate(${position.x}px, ${position.y}px)`,
-              opacity: opacity,
+              opacity,
               position: 'fixed',
-              cursor: 'grab',
+              cursor: isDragging ? 'grabbing' : 'grab',
               zIndex: 10000,
-              
+              transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
             }}
             onClick={(e) => {
-              const test = 1;
-              // 检查是否为有效点击（非拖拽操作）
-              const dx = Math.abs(e.clientX - dragStartPosition.x);
-              const dy = Math.abs(e.clientY - dragStartPosition.y);
-              if (dx < 5 && dy < 5) {
-                setIsExpanded(true);
-              }
-             }}    
+              const dx = Math.abs(e.clientX - dragStartPosition.current.x);
+              const dy = Math.abs(e.clientY - dragStartPosition.current.y);
+              if (dx < 5 && dy < 5) setIsExpanded(true);
+            }}
           >
             🦾
           </div>
@@ -139,19 +163,22 @@ const SmartAssistant = () => {
             nodeRef={dragRef}
             onStart={handleDragStart}
             onDrag={handleDrag}
+            onStop={handleDragEnd}
             bounds="parent"
+            enableUserSelectHack={false}
           >
             <div
               ref={dragRef}
               className="assistant-window"
               style={{ 
                 transform: `translate(${position.x}px, ${position.y}px)`,
-                opacity: opacity,
+                opacity,
                 width: size.width,
                 height: size.height,
                 zIndex: 10000,
                 position: 'fixed',
-                cursor: 'grab'
+                cursor: isDragging ? 'grabbing' : 'grab',
+                transition: isDragging ? 'none' : 'transform 0.15s ease-out'
               }}
             >
               <div className="window-header" onMouseDown={(e) => e.stopPropagation()}>
@@ -190,8 +217,8 @@ const SmartAssistant = () => {
                 style={{ 
                   transform: `scale(${scale})`, 
                   transformOrigin: '0 0',
-                  width: `${300}px`,
-                  height: `${400}px`
+                  width: '300px',
+                  height: '400px'
                 }}
               >
                 {activeTab === 'settings' ? (
