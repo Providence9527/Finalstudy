@@ -23,7 +23,7 @@ import {
         '&:last-child': { pb: 2 }
       }}>
         <img 
-          src={course?.thumbnail || '/public/default-book.png'}
+          src={course?.thumbnail || '/default-book.png'}
           alt={course?.title || '课程封面'}
           style={{ 
             width: 100,
