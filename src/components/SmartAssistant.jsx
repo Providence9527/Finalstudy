@@ -6,6 +6,7 @@ import NoteMode from './NoteMode';
 import MindmapMode from './MindmapMode';
 import AssistantMode from './AssistantMode';
 import './SmartAssistant.css';
+import { fetchCurrentMarkdown } from '../api/learning'; 
 
 const mockData = `核心概念
   ## 人工智能
@@ -29,7 +30,7 @@ const MODE_TABS = {
     id: 'mindmap', 
     label: '脑图模式',
     component: (props) => <MindmapMode {...props} />,
-    data:mockData
+
   },
   assistantMode: { 
     id: 'assistant', 
@@ -58,6 +59,8 @@ const SmartAssistant = () => {
   const [scale, setScale] = useState(1);
   const offset = useRef({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [markdownData, setMarkdownData] = useState(null); 
+  const [loading, setLoading] = useState(true);
   const dragStartPosition = useRef({ x: 0, y: 0 });
   
   const resizeData = useRef({
@@ -70,6 +73,16 @@ const SmartAssistant = () => {
     startLeft: 0,
     startTop: 0
   });
+ 
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const data = await fetchCurrentMarkdown();
+      setMarkdownData(data || mockData);
+      setLoading(false);
+    };
+    loadData();
+  }, []);
 
   const clampPosition = useCallback((x, y) => ({
     x: Math.max(10, Math.min(x, window.innerWidth - 50)),
@@ -224,6 +237,15 @@ const SmartAssistant = () => {
     });
   }, [activeTab]);
 
+  // 生成动态数据配置
+  const dynamicTabs = useCallback(() => ({
+    ...MODE_TABS,
+    mindmapMode: {
+      ...MODE_TABS.mindmapMode,
+      data: markdownData || mockData
+    }
+  }), [markdownData]);
+
   const generateTabs = useCallback(() => [
     { id: 'settings', label: '模式设置', component: null },
     ...[...visibleTabs].map(modeKey => ({
@@ -231,10 +253,7 @@ const SmartAssistant = () => {
       component: (
         <div className="mode-tab-content" key={`content-${modeKey}`}>
           {MODE_TABS[modeKey].component({
-            data: MODE_TABS[modeKey].data,
-            width: baseSize.current.width - 40,
-            eight: size.height - 120,
-            handleToggle: () => toggleMode(modeKey)
+            data: dynamicTabs()[modeKey].data,
           })}
         </div>
       )
@@ -349,8 +368,9 @@ const SmartAssistant = () => {
               className="window-content-wrapper"
               style={{
                 width: '100%',
-                height: 'calc(100% - 40px)',
+                height: 'calc(100vh - 40px)',
                 overflow: 'hidden',
+                position: 'relative'
               }}
             >
               <div
@@ -358,8 +378,12 @@ const SmartAssistant = () => {
                 style={{ 
                   transform: `scale(${scale})`,
                   transformOrigin: '0 0',
-                  width: baseSize.current.width,
-                  height: baseSize.current.height,
+                  width: '100%',
+                  height: '100%', 
+                  position: 'absolute', 
+                  top: 0,
+                  left: 0
+
                 }}
               >
                 {activeTab === 'settings' ? (

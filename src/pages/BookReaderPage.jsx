@@ -41,6 +41,7 @@ export default function BookReaderPage() {
     const loadContent = async () => {
       try {
         const response = await fetchBookContent(id);
+        //console.log("BR页面取回:  ",response)
         if (!SUPPORTED_TYPES.includes(response.type)) {
           throw new Error(`不支持的文件格式: ${response.type}`);
         }

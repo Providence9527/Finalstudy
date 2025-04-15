@@ -167,6 +167,7 @@ export const fetchFilterOptions = async () => {
 
 export const fetchBookContent = async (id) => {
   const response = await fetch(`/api/books/${id}/content/`);
+  console.log("fbc取回:",response)
   const responseData = await response.json()
     .catch(error => {
       console.error('[API] 响应解析失败', error);
@@ -314,6 +315,18 @@ export const fetchLastViewed = async (userId) => {
 };
 
 
+// 智能助手接口
+export const fetchCurrentMarkdown = async () => {
+  try {
+    const response = await fetch('/api/current/markdown');
+    if (!response.ok) throw new Error('获取内容失败');
+    const { data } = await response.json();
+    return data?.content || '';
+  } catch (error) {
+    console.error('获取Markdown失败:', error);
+    return '';
+  }
+};
 
 
 

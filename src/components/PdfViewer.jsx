@@ -42,10 +42,10 @@ export default function PdfViewer({ url, mode = 'pdfjs', onMaxRetry, onProgressC
           const loadingTask = pdfjsLib.getDocument({ url });
           
           loadingTask.onProgress = (progressParams) => {
-            console.debug('[PDF.js] 文件加载进度:', {
-              已加载: `${(progressParams.loaded / 1024).toFixed(1)}KB`,
-              总大小: progressParams.total ? `${(progressParams.total / 1024).toFixed(1)}KB` : '计算中...'
-            });
+            // console.debug('[PDF.js] 文件加载进度:', {
+            //   已加载: `${(progressParams.loaded / 1024).toFixed(1)}KB`,
+            //   总大小: progressParams.total ? `${(progressParams.total / 1024).toFixed(1)}KB` : '计算中...'
+            // });
           };
 
           const pdf = await loadingTask.promise;

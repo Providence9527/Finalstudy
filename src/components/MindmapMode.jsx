@@ -5,10 +5,7 @@ import { Markmap } from 'markmap-view';
 
 
 const MindmapMode = ({ 
-  handleToggle, 
   data, 
-  width = '100%', 
-  height = '600px' 
 }) => {
   const [value, setValue] = useState("");
   const refSvg = useRef(null);
@@ -37,8 +34,8 @@ const MindmapMode = ({
     <div className="mindmap-page" style={{ 
       width: '100%', 
       height: '100%',
-      position: 'relative',  // 新增
-      overflow: 'hidden'     // 新增
+      position: 'relative',  
+      overflow: 'hidden'     
     }}>
       <svg 
         ref={refSvg} 
