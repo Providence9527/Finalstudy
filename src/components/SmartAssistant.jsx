@@ -39,7 +39,7 @@ const MODE_TABS = {
   }
 };
 
-const SmartAssistant = () => {
+const SmartAssistant = ({ documentUrl, currentPage }) => {
   const dragRef = useRef(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('settings');
@@ -242,8 +242,13 @@ const SmartAssistant = () => {
     ...MODE_TABS,
     mindmapMode: {
       ...MODE_TABS.mindmapMode,
+      documentContext: { url: documentUrl, page: currentPage },
       data: markdownData || mockData
-    }
+    },
+    // noteMode: {
+    //   ...MODE_TABS.noteMode,
+    //   documentContext: { url: documentUrl, page: currentPage }
+    // }
   }), [markdownData]);
 
   const generateTabs = useCallback(() => [
@@ -254,6 +259,7 @@ const SmartAssistant = () => {
         <div className="mode-tab-content" key={`content-${modeKey}`}>
           {MODE_TABS[modeKey].component({
             data: dynamicTabs()[modeKey].data,
+            documentContext: { url: documentUrl, page: currentPage }
           })}
         </div>
       )

@@ -34,6 +34,7 @@ export default function BookReaderPage() {
     content: { type: null, url: null, meta: {} },
     bookMeta: null
   });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [showFallbackDialog, setShowFallbackDialog] = useState(false);
 
@@ -114,6 +115,11 @@ export default function BookReaderPage() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [user, state.bookMeta, id, readingProgress]);
+  
+  const handlePageChange = (pageNumber) => {
+    console.log('当前页码:', pageNumber);
+    setCurrentPage(pageNumber);
+  };
 
   if (state.loading) {
     return (
@@ -155,7 +161,10 @@ export default function BookReaderPage() {
           touchAction: 'none'
         }
       }}>
-        <SmartAssistant />
+        <SmartAssistant 
+            documentUrl={state.content.url}
+            currentPage={currentPage}
+         />
       </Box>
 
       <IconButton
@@ -203,6 +212,7 @@ export default function BookReaderPage() {
               mode={searchParams.get('reader')}
               onMaxRetry={() => setShowFallbackDialog(true)}
               onProgressChange={setReadingProgress}
+              onPageChange={handlePageChange}
             />
           )}
           {state.content.type === 'epub' && (

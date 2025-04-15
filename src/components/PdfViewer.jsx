@@ -12,7 +12,7 @@ const configurePDFJS = () => {
 };
 configurePDFJS();
 
-export default function PdfViewer({ url, mode = 'pdfjs', onMaxRetry, onProgressChange }) {
+export default function PdfViewer({ url, mode = 'pdfjs', onMaxRetry, onProgressChange, onPageChange }) {
   const [retryCount, setRetryCount] = useState(0);
   const [validationPassed, setValidationPassed] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
@@ -115,6 +115,7 @@ export default function PdfViewer({ url, mode = 'pdfjs', onMaxRetry, onProgressC
         const safeProgress = Math.min((pageNumber / totalPages), 1).toFixed(2);
         onProgressChange?.(parseFloat(safeProgress));
       }
+      onPageChange?.(pageNumber);
     } catch (error) {
       console.error('页面监控异常:', error.message, {
         页码: current?.currentPage + 1,
