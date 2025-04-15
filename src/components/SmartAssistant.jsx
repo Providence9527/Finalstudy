@@ -2,23 +2,26 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { DraggableCore } from 'react-draggable';
 import Slider from '@mui/material/Slider';
 import Switch from './Switch';
+import NoteMode from './NoteMode';
+import MindmapMode from './MindmapMode';
+import AssistantMode from './AssistantMode';
 import './SmartAssistant.css';
 
 const MODE_TABS = {
   noteMode: { 
     id: 'note', 
-    label: '笔记模式', 
-    component: <div className="content-item">笔记内容</div> 
+    label: '笔记模式',
+    component: (props) => <NoteMode {...props} />
   },
   mindmapMode: { 
     id: 'mindmap', 
-    label: '脑图模式', 
-    component: <div className="content-item">脑图内容</div> 
+    label: '脑图模式',
+    component: (props) => <MindmapMode {...props} />
   },
   assistantMode: { 
     id: 'assistant', 
-    label: '助手模式', 
-    component: <div className="content-item">助手内容</div> 
+    label: '助手模式',
+    component: (props) => <AssistantMode {...props} />
   }
 };
 
@@ -211,17 +214,10 @@ const SmartAssistant = () => {
       ...MODE_TABS[modeKey],
       component: (
         <div className="mode-tab-content" key={`content-${modeKey}`}>
-          <div className="mode-header">
-            <h3>{MODE_TABS[modeKey].label}</h3>
-            <Switch
-              isOn={modes[modeKey]}
-              handleToggle={() => toggleMode(modeKey)}
-              style={{ marginLeft: 'auto' }}
-            />
-          </div>
-          <div className="mode-content">
-            {MODE_TABS[modeKey].component}
-          </div>
+          {MODE_TABS[modeKey].component({
+            isOn: modes[modeKey],
+            handleToggle: () => toggleMode(modeKey)
+          })}
         </div>
       )
     }))

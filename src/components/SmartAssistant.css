@@ -263,3 +263,105 @@
   height: 14px !important;
   margin-top: -2px !important;
 }
+
+
+/* 笔记模式样式 */
+.note-list {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0;
+}
+
+.note-list li {
+  padding: 8px;
+  margin: 5px 0;
+  background: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.note-list li:hover {
+  background: #eee;
+}
+
+.note-toolbar {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+/* 脑图模式样式 */
+.mindmap-container {
+  height: 300px;
+  border: 1px solid #ddd;
+  margin: 15px 0;
+  position: relative;
+}
+
+.mindmap-node {
+  padding: 8px 12px;
+  background: #fff;
+  border: 2px solid #4CAF50;
+  border-radius: 20px;
+  position: absolute;
+  cursor: move;
+  transition: transform 0.2s;
+}
+
+.mindmap-branch {
+  position: relative;
+  margin-left: 120px;
+  margin-top: 20px;
+}
+
+.mindmap-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* 助手模式样式 */
+.assistant-chat {
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-history {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 15px;
+}
+
+.message-bubble.assistant {
+  background: #e3f2fd;
+  align-self: flex-start;
+}
+
+.message-bubble.user {
+  background: #f5f5f5;
+  align-self: flex-end;
+}
+
+.chat-input {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
