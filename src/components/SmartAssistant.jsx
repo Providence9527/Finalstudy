@@ -7,6 +7,18 @@ import MindmapMode from './MindmapMode';
 import AssistantMode from './AssistantMode';
 import './SmartAssistant.css';
 
+const mockData = `核心概念
+  ## 人工智能
+  ### 机器学习
+  ### 深度学习
+  ## 应用领域
+  ### 自然语言处理
+  ### 计算机视觉
+  ## 发展历史
+  ### 符号主义
+  ### 连接主义
+  ### 行为主义`
+  
 const MODE_TABS = {
   noteMode: { 
     id: 'note', 
@@ -16,7 +28,8 @@ const MODE_TABS = {
   mindmapMode: { 
     id: 'mindmap', 
     label: '脑图模式',
-    component: (props) => <MindmapMode {...props} />
+    component: (props) => <MindmapMode {...props} />,
+    data:mockData
   },
   assistantMode: { 
     id: 'assistant', 
@@ -198,6 +211,9 @@ const SmartAssistant = () => {
       const newState = !prev[modeKey];
       setVisibleTabs(prevTabs => {
         const newTabs = new Set(prevTabs);
+        if (newState) {
+          setActiveTab(MODE_TABS[modeKey].id);
+        }
         newState ? newTabs.add(modeKey) : newTabs.delete(modeKey);
         if (!newState && activeTab === MODE_TABS[modeKey].id) {
           setActiveTab('settings');
@@ -216,6 +232,9 @@ const SmartAssistant = () => {
         <div className="mode-tab-content" key={`content-${modeKey}`}>
           {MODE_TABS[modeKey].component({
             isOn: modes[modeKey],
+            data: MODE_TABS[modeKey].data,
+            width: baseSize.current.width - 40,
+            eight: size.height - 120,
             handleToggle: () => toggleMode(modeKey)
           })}
         </div>
@@ -351,7 +370,7 @@ const SmartAssistant = () => {
                         <label>{config.label}</label>
                         <Switch
                           isOn={modes[modeKey]}
-                          handleToggle={() => toggleMode(modeKey)}
+                          handleToggle={() => modes[modeKey] ? toggleMode(modeKey) : toggleMode(modeKey)}
                         />
                       </div>
                     ))}

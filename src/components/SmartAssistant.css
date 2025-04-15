@@ -365,3 +365,56 @@
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+
+.mindmap-container {
+  position: relative;
+  overflow: auto;
+  border: 1px solid #ddd;
+  margin: 15px 0;
+  background: #f9f9f9;
+}
+
+.mindmap-node-wrapper {
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.mindmap-node {
+  padding: 12px 20px;
+  background: #fff;
+  border: 2px solid #4CAF50;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.mindmap-node:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.connection-line {
+  position: absolute;
+  background: #4CAF50;
+  transform-origin: top left;
+}
+
+.children-container {
+  position: relative;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.mindmap-toolbar {
+  position: sticky;
+  bottom: 0;
+  background: rgba(255,255,255,0.9);
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
