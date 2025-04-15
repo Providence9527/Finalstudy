@@ -231,7 +231,6 @@ const SmartAssistant = () => {
       component: (
         <div className="mode-tab-content" key={`content-${modeKey}`}>
           {MODE_TABS[modeKey].component({
-            isOn: modes[modeKey],
             data: MODE_TABS[modeKey].data,
             width: baseSize.current.width - 40,
             eight: size.height - 120,
