@@ -8,17 +8,12 @@ import AssistantMode from './AssistantMode';
 import './SmartAssistant.css';
 import { fetchCurrentMarkdown } from '../api/learning'; 
 
-const mockData = `核心概念
-  ## 人工智能
-  ### 机器学习
-  ### 深度学习
-  ## 应用领域
-  ### 自然语言处理
-  ### 计算机视觉
-  ## 发展历史
-  ### 符号主义
-  ### 连接主义
-  ### 行为主义`
+const mockData = `
+  ##脑图显示失败
+  ### 可能是扫描版PDF无法显示
+  ### 可能是空白页面无法显示
+  ### 可能是图像格式内容无法显示
+  `
   
 const MODE_TABS = {
   noteMode: { 
@@ -80,7 +75,7 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
       setLoading(true);
       //console.log("触发取回md前")
       const data = await fetchCurrentMarkdown({documentUrl, currentPage});
-      console.log("触发取回md后",data)
+      console.log("api返回",data)
       setMarkdownData(data || mockData);
       setLoading(false);
     };

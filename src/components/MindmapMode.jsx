@@ -7,7 +7,7 @@ import { Markmap } from 'markmap-view';
 const MindmapMode = ({ 
   data, 
 }) => {
-  
+  console.log("组件接收内容",data)
   const [value, setValue] = useState("");
   const refSvg = useRef(null);
   const transformer = new Transformer();
