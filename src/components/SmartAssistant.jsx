@@ -40,6 +40,7 @@ const MODE_TABS = {
 };
 
 const SmartAssistant = ({ documentUrl, currentPage }) => {
+  // console.log("智能助手props: ", documentUrl, currentPage )
   const dragRef = useRef(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('settings');
@@ -77,12 +78,14 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      const data = await fetchCurrentMarkdown();
+      //console.log("触发取回md前")
+      const data = await fetchCurrentMarkdown({documentUrl, currentPage});
+      console.log("触发取回md后",data)
       setMarkdownData(data || mockData);
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [documentUrl, currentPage]);
 
   const clampPosition = useCallback((x, y) => ({
     x: Math.max(10, Math.min(x, window.innerWidth - 50)),
@@ -242,7 +245,6 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
     ...MODE_TABS,
     mindmapMode: {
       ...MODE_TABS.mindmapMode,
-      documentContext: { url: documentUrl, page: currentPage },
       data: markdownData || mockData
     },
     // noteMode: {

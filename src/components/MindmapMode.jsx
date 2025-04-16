@@ -7,6 +7,7 @@ import { Markmap } from 'markmap-view';
 const MindmapMode = ({ 
   data, 
 }) => {
+  
   const [value, setValue] = useState("");
   const refSvg = useRef(null);
   const transformer = new Transformer();
