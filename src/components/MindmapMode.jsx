@@ -10,6 +10,7 @@ import zhCN from 'date-fns/locale/zh-CN';
 
 const MindmapMode = ({ data, lastUpdated, onRefresh }) => {
   const dataRef = useRef(data);
+  const lastUpdatedRef = useRef(lastUpdated);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const svgRef = useRef(null);
@@ -20,6 +21,7 @@ const MindmapMode = ({ data, lastUpdated, onRefresh }) => {
   useEffect(() => {
     console.log('[Mindmap] 收到新数据', 
               `变更标识: ${data !== dataRef.current}`,
+              `时间标识: ${lastUpdated !== lastUpdatedRef.current}`,
               `长度: ${data?.length}`, `时间戳: ${lastUpdated}`);
     dataRef.current = data;
     let isMounted = true;

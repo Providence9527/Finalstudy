@@ -300,7 +300,7 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
         </div>
       )
     }))
-  ], [visibleTabs, modes, toggleMode]);
+  ], [visibleTabs, modes, toggleMode,dynamicTabs, documentUrl, currentPage]);
 
   return (
     <div className="smart-assistant-container">
