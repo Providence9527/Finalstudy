@@ -37,6 +37,7 @@ const MODE_TABS = {
 const SmartAssistant = ({ documentUrl, currentPage }) => {
   // console.log("智能助手props: ", documentUrl, currentPage )
   const dragRef = useRef(null);
+  const markdownDataRef = useRef();
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('settings');
   const [position, setPosition] = useState({ 
@@ -75,6 +76,12 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
     loadData();
     }, [documentUrl, currentPage]);
     
+
+
+    useEffect(() => {
+      markdownDataRef.current = markdownData;
+    }, [markdownData]);
+
     const currentPageRef = useRef(currentPage);
     useEffect(() => {
           currentPageRef.current = currentPage;
@@ -82,7 +89,7 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
 
     const handleRefresh = useCallback(() => {
           console.log("触发本地刷新，使用缓存数据", {
-            length: markdownData?.length,
+            length: markdownDataRef.current?.length,
             currentPage: currentPageRef.current
           });
           setLastUpdated(prev => {
@@ -90,7 +97,7 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
             console.log("生成新时间戳:", newTimestamp);
             return newTimestamp;
           });
-        }, [markdownData]); // 依赖markdownData变化
+        }, []); // 依赖markdownData变化
 
     const loadData = useCallback(async () => {
       try {

@@ -102,7 +102,8 @@ const MindmapMode = ({ data, lastUpdated, onRefresh }) => {
       setLoading(true);
       setError(null);
       try {
-        onRefresh(); // 不再等待API请求
+        onRefresh();
+        console.log("主刷新完成")
       } finally {
       setLoading(false);
     }
