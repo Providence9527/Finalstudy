@@ -58,6 +58,7 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
   const [markdownData, setMarkdownData] = useState(null); 
   const [loading, setLoading] = useState(true);
   const dragStartPosition = useRef({ x: 0, y: 0 });
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
   
   const resizeData = useRef({
     isResizing: false,
@@ -71,15 +72,41 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
   });
  
   useEffect(() => {
-    const loadData = async () => {
+    loadData();
+    }, [documentUrl, currentPage]);
+    
+    const currentPageRef = useRef(currentPage);
+    useEffect(() => {
+          currentPageRef.current = currentPage;
+        }, [currentPage]);
+
+    const handleRefresh = useCallback(() => {
+          console.log("触发本地刷新，使用缓存数据", {
+            length: markdownData?.length,
+            currentPage: currentPageRef.current
+          });
+          setLastUpdated(prev => {
+            const newTimestamp = Date.now();
+            console.log("生成新时间戳:", newTimestamp);
+            return newTimestamp;
+          });
+        }, [markdownData]); // 依赖markdownData变化
+
+    const loadData = useCallback(async () => {
+      try {
       setLoading(true);
       //console.log("触发取回md前")
+      console.log("正在请求数据...", { documentUrl, currentPage });
       const data = await fetchCurrentMarkdown({documentUrl, currentPage});
-      console.log("api返回",data)
+      console.log("[api返回]",data.length)
       setMarkdownData(data || mockData);
+      console.log("[api设置的md]",markdownData.length)
+      setLastUpdated(Date.now());
+      } catch (error) {
+        console.error("数据加载失败:", error);
+      } finally {
       setLoading(false);
-    };
-    loadData();
+    }
   }, [documentUrl, currentPage]);
 
   const clampPosition = useCallback((x, y) => ({
@@ -240,24 +267,29 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
     ...MODE_TABS,
     mindmapMode: {
       ...MODE_TABS.mindmapMode,
-      data: markdownData || mockData
+      data: markdownData || mockData,
+      lastUpdated: lastUpdated,
+      onRefresh: handleRefresh
     },
     // noteMode: {
     //   ...MODE_TABS.noteMode,
     //   documentContext: { url: documentUrl, page: currentPage }
     // }
-  }), [markdownData]);
+  }), [markdownData, lastUpdated, handleRefresh]); 
 
   const generateTabs = useCallback(() => [
     { id: 'settings', label: '模式设置', component: null },
     ...[...visibleTabs].map(modeKey => ({
-      ...MODE_TABS[modeKey],
+      ...dynamicTabs()[modeKey],
       component: (
         <div className="mode-tab-content" key={`content-${modeKey}`}>
-          {MODE_TABS[modeKey].component({
-            data: dynamicTabs()[modeKey].data,
-            documentContext: { url: documentUrl, page: currentPage }
-          })}
+          {dynamicTabs()[modeKey].component({
+              ...dynamicTabs()[modeKey],
+              documentContext: { 
+                url: documentUrl, 
+                page: currentPage 
+              },
+            })} 
         </div>
       )
     }))

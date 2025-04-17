@@ -318,14 +318,14 @@ export const fetchLastViewed = async (userId) => {
 // 智能助手接口
 export const fetchCurrentMarkdown = async ({ documentUrl, currentPage }) => {
   try {
-    console.log("md准备请求   ",documentUrl, currentPage)
+    //console.log("md准备请求   ",documentUrl, currentPage)
     const safeUrl = documentUrl || '';
     const safePage = currentPage || 1;
     const response = await fetch(`/api/current/markdown?documentUrl=${encodeURIComponent(safeUrl)}&currentPage=${safePage}`);
     if (!response.ok) throw new Error('获取内容失败');
 
     const { data } = await response.json();
-    console.log("api取回的md数据:  ",data)
+    //console.log("api取回的md数据:  ",data)
     return data?.content || '';
     
   } catch (error) {
