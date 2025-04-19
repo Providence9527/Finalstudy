@@ -24,7 +24,6 @@ import OngoingCoursesCard from '../components/OngoingCoursesCard';
 import { 
   Box
 } from '@mui/material';
-import SmartAssistant from '../components/SmartAssistant';
 
 const RecommendCourseItem = ({ course }) => (
   <Card variant="outlined" sx={{ 
@@ -138,9 +137,7 @@ const Dashboard = ({ sidebarCollapsed, setIsSidebarCollapsed }) => {
   return (
     
     <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-      <Box sx={{ position: 'fixed', zIndex: 9999 }}>
-         <SmartAssistant />
-      </Box>
+      
       <div style={{ 
         marginBottom: 32,
         display: 'flex',

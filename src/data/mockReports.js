@@ -37,12 +37,73 @@ export const mockReports = {
       focusArea: "前端架构"
     },
     advice: "本月建议学习微前端架构，完成模块化项目拆分实践",
-    graph: {
-      nodes: [
-        { id: "MicroFrontend", name: "微前端", group: "arch" },
-        { id: "ModuleFederation", name: "模块联邦", group: "arch" }
+    graph:{
+      "nodes": [
+        {
+          "id": "linux_file",
+          "name": "Linux中的文件",
+          "group": "core_concept"
+        },
+        {
+          "id": "file_descriptor",
+          "name": "文件描述符",
+          "group": "core_concept"
+        },
+        {
+          "id": "file_table",
+          "name": "文件表",
+          "group": "core_concept"
+        },
+        {
+          "id": "vfs",
+          "name": "VFS机制",
+          "group": "core_concept"
+        },
+        {
+          "id": "file_io",
+          "name": "文件I/O",
+          "group": "操作系统"
+        },
+        {
+          "id": "linux_kernel",
+          "name": "Linux内核",
+          "group": "操作系统"
+        },
+        {
+          "id": "system_call",
+          "name": "系统调用",
+          "group": "操作系统"
+        }
       ],
-      links: [{ source: "MicroFrontend", target: "ModuleFederation" }]
+      "links": [
+        {
+          "source": "linux_file",
+          "target": "file_descriptor",
+          "type": "alternatives"
+        },
+        {
+          "source": "linux_file",
+          "target": "file_table",
+          "type": "dependency"
+        },
+        {
+          "source": "linux_file",
+          "target": "vfs",
+          "type": "dependency"
+        },
+        {
+          "source": "file_io",
+          "target": "linux_kernel",
+          "type": "dependency"
+        },
+        {
+          "source": "linux_kernel",
+          "target": "system_call",
+          "type": "alternatives"
+        }
+      ]
     }
+    
+    
   }
 };
