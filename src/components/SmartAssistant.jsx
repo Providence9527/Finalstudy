@@ -7,6 +7,7 @@ import MindmapMode from './MindmapMode';
 import AssistantMode from './AssistantMode';
 import './SmartAssistant.css';
 import { fetchCurrentMarkdown } from '../api/learning'; 
+import { useAuth } from '../contexts/AuthContext';
 
 const mockData = `
   ##脑图显示失败
@@ -36,6 +37,7 @@ const MODE_TABS = {
 
 const SmartAssistant = ({ documentUrl, currentPage }) => {
   // console.log("智能助手props: ", documentUrl, currentPage )
+  const { user } = useAuth();
   const dragRef = useRef(null);
   const markdownDataRef = useRef();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -104,8 +106,11 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
       setLoading(true);
       //console.log("触发取回md前")
       console.log("正在请求数据...", { documentUrl, currentPage });
-      const data = await fetchCurrentMarkdown({documentUrl, currentPage});
-      console.log("[api返回]",data.length)
+      
+      const userId = user.userId;
+      console.log("用户ID",userId);
+      const data = await fetchCurrentMarkdown({documentUrl, currentPage,userId});
+      console.log("[api返回]",data.length);
       setMarkdownData(data || mockData);
       console.log("[api设置的md]",markdownData.length)
       setLastUpdated(Date.now());

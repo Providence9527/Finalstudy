@@ -37,69 +37,74 @@ export const mockReports = {
       focusArea: "前端架构"
     },
     advice: "本月建议学习微前端架构，完成模块化项目拆分实践",
-    graph:{
+    graph: {
       "nodes": [
         {
-          "id": "linux_file",
-          "name": "Linux中的文件",
-          "group": "core_concept"
+          "id": "67e541f558d8e0bb89e2291c",
+          "name": "Linux环境编程：从应用到内核",
+          "group": "67e541f558d8e0bb89e2291c"
         },
         {
-          "id": "file_descriptor",
-          "name": "文件描述符",
-          "group": "core_concept"
+          "id": "linux_unix_technical_series",
+          "name": "Linux/Unix技术丛书",
+          "group": "67e541f558d8e0bb89e2291c"
         },
         {
-          "id": "file_table",
-          "name": "文件表",
-          "group": "core_concept"
+          "id": "linux_environment_programming",
+          "name": "Linux环境编程：从应用到内核",
+          "group": "67e541f558d8e0bb89e2291c"
         },
         {
-          "id": "vfs",
-          "name": "VFS机制",
-          "group": "core_concept"
+          "id": "gao_feng",
+          "name": "高峰",
+          "group": "67e541f558d8e0bb89e2291c"
         },
         {
-          "id": "file_io",
-          "name": "文件I/O",
-          "group": "操作系统"
+          "id": "li_bin",
+          "name": "李彬",
+          "group": "67e541f558d8e0bb89e2291c"
         },
         {
-          "id": "linux_kernel",
-          "name": "Linux内核",
-          "group": "操作系统"
+          "id": "machinery_publishing",
+          "name": "机械工业出版社",
+          "group": "67e541f558d8e0bb89e2291c"
         },
         {
-          "id": "system_call",
-          "name": "系统调用",
-          "group": "操作系统"
+          "id": "huazhang_subsidiary",
+          "name": "华章分社（北京华章图文信息有限公司，北京奥维博世图书发行有限公司）",
+          "group": "67e541f558d8e0bb89e2291c"
         }
       ],
       "links": [
         {
-          "source": "linux_file",
-          "target": "file_descriptor",
-          "type": "alternatives"
+          "source": "linux_environment_programming",
+          "target": "gao_feng",
+          "type": "authored_by"
         },
         {
-          "source": "linux_file",
-          "target": "file_table",
-          "type": "dependency"
+          "source": "linux_environment_programming",
+          "target": "li_bin",
+          "type": "authored_by"
         },
         {
-          "source": "linux_file",
-          "target": "vfs",
-          "type": "dependency"
+          "source": "linux_environment_programming",
+          "target": "machinery_publishing",
+          "type": "published_by"
         },
         {
-          "source": "file_io",
-          "target": "linux_kernel",
-          "type": "dependency"
+          "source": "linux_environment_programming",
+          "target": "huazhang_subsidiary",
+          "type": "published_by"
         },
         {
-          "source": "linux_kernel",
-          "target": "system_call",
-          "type": "alternatives"
+          "source": "linux_unix_technical_series",
+          "target": "67e541f558d8e0bb89e2291c",
+          "type": "from"
+        },
+        {
+          "source": "li_bin",
+          "target": "67e541f558d8e0bb89e2291c",
+          "type": "from"
         }
       ]
     }

@@ -316,12 +316,16 @@ export const fetchLastViewed = async (userId) => {
 
 
 // 智能助手接口
-export const fetchCurrentMarkdown = async ({ documentUrl, currentPage }) => {
+export const fetchCurrentMarkdown = async ({ documentUrl, currentPage,userId}) => {
   try {
     //console.log("md准备请求   ",documentUrl, currentPage)
     const safeUrl = documentUrl || '';
     const safePage = currentPage || 1;
-    const response = await fetch(`/api/current/markdown?documentUrl=${encodeURIComponent(safeUrl)}&currentPage=${safePage}`);
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(userId && { 'X-User-Id': userId })  // 新增用户ID请求头
+    };
+    const response = await fetch(`/api/current/markdown?documentUrl=${encodeURIComponent(safeUrl)}&currentPage=${safePage}`,{ headers } );
     if (!response.ok) throw new Error('获取内容失败');
 
     const { data } = await response.json();
