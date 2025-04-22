@@ -1,12 +1,13 @@
 // src/components/TimeRangeTabs.jsx
 import PropTypes from 'prop-types';
-import { FiCalendar, FiSun, FiMoon } from 'react-icons/fi';
+import { FiCalendar, FiSun, FiMoon, FiClock } from 'react-icons/fi';
 
 const TimeRangeTabs = ({ activeRange, onChange }) => {
   const tabs = [
     { id: 'daily', label: '日报', icon: <FiSun /> },
     { id: 'weekly', label: '周报', icon: <FiCalendar /> },
     { id: 'monthly', label: '月报', icon: <FiMoon /> },
+    { id: 'history', label: '历史', icon: <FiClock /> }
   ];
 
   return (
@@ -26,7 +27,7 @@ const TimeRangeTabs = ({ activeRange, onChange }) => {
 };
 
 TimeRangeTabs.propTypes = {
-  activeRange: PropTypes.string.isRequired,
+  activeRange: PropTypes.oneOf(['daily', 'weekly', 'monthly', 'history']).isRequired,
   onChange: PropTypes.func.isRequired,
 };
 

@@ -504,7 +504,7 @@ body {
 /* src/styles/main.css */
 /* 新增样式 */
 .garden-container {
-  padding: 2rem;
+  padding: 0rem;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

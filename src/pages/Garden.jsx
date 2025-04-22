@@ -3,70 +3,149 @@ import { useState, useEffect } from 'react';
 import DataCard from '../components/DataCard';
 import TimeRangeTabs from '../components/TimeRangeTabs';
 import KnowledgeGraph from '../components/KnowledgeGraph';
-import { mockReports } from '../data/mockReports';
+import { fetchReport } from '../api/learning';
+import { useAuth } from '../contexts/AuthContext';
 import { useTimeTracking } from '../hooks/useTimeTracking';
+import '../styles/main.css';
 
 const Garden = () => {
-  useTimeTracking(); 
+  useTimeTracking();
+  const { user } = useAuth();
   const [activeRange, setActiveRange] = useState('weekly');
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isEmptyData, setIsEmptyData] = useState(false);
 
   useEffect(() => {
-    const loadData = () => {
+    const loadData = async () => {
+      if (!user?.userId) return;
+      
       setIsLoading(true);
-      setTimeout(() => {
-        setReportData(mockReports[activeRange]);
+      setError(null);
+      setIsEmptyData(false);
+
+      try {
+        console.log("取回学习报告中.......")
+        const data = await fetchReport(user?.userId, activeRange);
+        console.log("取回的学习报告",data)
+        if (data) {
+          const hasNodes = data.graph?.nodes?.length > 0;
+          const hasLinks = data.graph?.links?.length > 0;
+          setIsEmptyData(!hasNodes && !hasLinks);
+          setReportData(data);
+        } else {
+          setError('暂时没有可用的学习报告');
+        }
+      } catch (err) {
+        console.error('数据加载失败:', err);
+        setError('获取数据失败，请检查网络连接');
+      } finally {
         setIsLoading(false);
-      }, 300);
+      }
     };
+
     loadData();
-  }, [activeRange]);
+  }, [activeRange, user?.userId]);
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="loading-overlay">
+          <div className="loading-spinner" />
+          <p>正在生成知识图谱...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="graph-error">
+          <div className="error-icon">⚠️</div>
+          <p>无法加载知识图谱</p>
+          <button 
+            className="retry-button"
+            onClick={() => window.location.reload()}
+          >
+            重试
+          </button>
+        </div>
+      );
+    }
+
+    if (isEmptyData) {
+      return (
+        <div className="empty-graph">
+          <div className="empty-icon">📭</div>
+          <h4>当前没有可视化数据</h4>
+          <p>完成更多学习任务后会自动生成知识图谱</p>
+        </div>
+      );
+    }
+
+    return (
+      <KnowledgeGraph 
+        data={{ 
+          nodes: reportData?.graph?.nodes || [], 
+          links: reportData?.graph?.links || [] 
+        }} 
+      />
+    );
+  };
 
   return (
     <div className="garden-container">
-      {/* 顶部报告区域 */}
       <div className="report-header">
         <TimeRangeTabs
           activeRange={activeRange}
           onChange={setActiveRange}
         />
-        
-        {!isLoading && reportData && (
+
+        {error && (
+          <div className="error-banner">
+            <span className="error-icon">⚠️</span>
+            {error}
+          </div>
+        )}
+
+        {!reportData && !isLoading && (
+          <div className="empty-container">
+            <div className="empty-icon">📚</div>
+            <h3>还没有学习记录哦</h3>
+            <p>开始你的第一个学习任务吧！</p>
+          </div>
+        )}
+
+        {reportData && (
           <div className="stats-panel">
             <DataCard
               title="学习时长"
-              value={reportData.stats.duration}
+              value={reportData.stats.duration || '0h'}
               theme="blue"
             />
             <DataCard
               title="掌握概念"
-              value={reportData.stats.concepts}
+              value={reportData.stats.concepts || 0}
               unit="个"
               theme="green"
             />
             <DataCard
               title="重点领域"
-              value={reportData.stats.focusArea}
+              value={reportData.stats.focusArea || '未检测到'}
               theme="orange"
             />
             <div className="advice-card">
               <h4>学习建议</h4>
-              <p>{reportData.advice}</p>
+              <p>{reportData.advice || '暂无个性化建议'}</p>
             </div>
           </div>
         )}
       </div>
 
-      {/* 知识图谱面板 */}
       <div className="graph-panel">
         <h2 className="panel-title">{activeRange}知识结构图谱</h2>
         <div className="graph-container">
-          {isLoading ? (
-            <div className="loading-indicator">数据加载中...</div>
-          ) : (
-            <KnowledgeGraph data={reportData?.graph || { nodes: [], links: [] }} />
-          )}
+          {renderContent()}
         </div>
       </div>
     </div>

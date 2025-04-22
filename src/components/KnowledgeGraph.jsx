@@ -1,18 +1,22 @@
-// src/components/KnowledgeGraph/index.jsx
 import { useMemo, useRef, useEffect } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useResizeDetector } from 'react-resize-detector';
 import '../styles/main.css'
 import * as d3 from 'd3';
 
+// 哈希颜色生成函数
+const hashCode = str => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return hash;
+};
 
-// 预定义颜色方案
-const COLOR_MAP = {
-  hook: '#FF6B6B',
-  state: '#4D96FF',
-  '核心概念': '#6BCB77',
-  '操作系统': '#FFD93D',
-  default: '#999999',
+const getHslColor = (str, saturation = 70, lightness = 50) => {
+  const hash = hashCode(str);
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
 const KnowledgeGraph = ({ data = { nodes: [], links: [] } }) => {
@@ -21,12 +25,25 @@ const KnowledgeGraph = ({ data = { nodes: [], links: [] } }) => {
 
   // 处理图形数据（包含初始位置）
   const graphData = useMemo(() => {
-    const nodes = data.nodes.map(node => ({
-      ...node,
-      x: Math.random() * 100,  // 初始随机位置
-      y: Math.random() * 100,
-      color: COLOR_MAP[node.group] || COLOR_MAP.default,
-    }));
+    const colorCache = new Map();
+    
+    const nodes = data.nodes.map(node => {
+      // 生成唯一颜色
+      let color = '#999999';
+      if (node.group) {
+        if (!colorCache.has(node.group)) {
+          colorCache.set(node.group, getHslColor(node.group));
+        }
+        color = colorCache.get(node.group);
+      }
+
+      return {
+        ...node,
+        x: Math.random() * 100,  // 初始随机位置
+        y: Math.random() * 100,
+        color: color,
+      };
+    });
 
     return {
       nodes,
@@ -114,11 +131,10 @@ const KnowledgeGraph = ({ data = { nodes: [], links: [] } }) => {
           ctx.lineWidth = 1;
           ctx.stroke();
 
-
-           // 箭头绘制逻辑
+          // 箭头绘制逻辑
           const arrowSize = 5;
           const arrowDirection = Math.atan2(ty - sy, tx - sx);
-          const arrowHeadPos = 0.9; // 箭头位于连线末端90%位置
+          const arrowHeadPos = 0.9;
           
           // 计算箭头位置
           const arrowX = sx + (tx - sx) * arrowHeadPos;
@@ -127,15 +143,15 @@ const KnowledgeGraph = ({ data = { nodes: [], links: [] } }) => {
           // 绘制箭头三角形
           ctx.beginPath();
           ctx.moveTo(
-                        arrowX - arrowSize * Math.cos(arrowDirection - Math.PI / 6),
-                        arrowY - arrowSize * Math.sin(arrowDirection - Math.PI / 6)
-                      );
-                      ctx.lineTo(arrowX, arrowY);
-                      ctx.lineTo(
-                        arrowX - arrowSize * Math.cos(arrowDirection + Math.PI / 6),
-                        arrowY - arrowSize * Math.sin(arrowDirection + Math.PI / 6)
-                      );
-                      ctx.closePath();
+            arrowX - arrowSize * Math.cos(arrowDirection - Math.PI / 6),
+            arrowY - arrowSize * Math.sin(arrowDirection - Math.PI / 6)
+          );
+          ctx.lineTo(arrowX, arrowY);
+          ctx.lineTo(
+            arrowX - arrowSize * Math.cos(arrowDirection + Math.PI / 6),
+            arrowY - arrowSize * Math.sin(arrowDirection + Math.PI / 6)
+          );
+          ctx.closePath();
           ctx.fillStyle = link.color;
           ctx.fill();
 

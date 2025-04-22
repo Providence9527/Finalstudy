@@ -338,6 +338,32 @@ export const fetchCurrentMarkdown = async ({ documentUrl, currentPage,userId}) =
   }
 };
 
-
+// 知识图谱获取api
+export const fetchReport = async (userId, period) => {
+  try {
+    console.log("准备取回报告")
+    const response = await fetch(`/api/users/${userId}/report?period=${period}`);
+    
+    if (!response.ok) throw new Error('请求失败');
+    const { data } = await response.json();
+    console.log("取回报告",data)
+    // 转换API响应格式到前端所需结构
+    return {
+      stats: {
+        duration: data.stats.study_duration,
+        concepts: data.stats.mastered_concepts,
+        focusArea: data.stats.focus_area
+      },
+      advice: data.recommendation,
+      graph: {
+        nodes: data.knowledge_graph?.nodes || [],
+        links: data.knowledge_graph?.links || [] 
+      }
+    };
+  } catch (error) {
+    console.error('获取学习报告失败:', error);
+    return null;
+  }
+};
 
 
