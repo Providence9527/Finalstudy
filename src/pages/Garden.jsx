@@ -16,6 +16,7 @@ const Garden = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isEmptyData, setIsEmptyData] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,9 +27,7 @@ const Garden = () => {
       setIsEmptyData(false);
 
       try {
-        console.log("取回学习报告中.......")
         const data = await fetchReport(user?.userId, activeRange);
-        console.log("取回的学习报告",data)
         if (data) {
           const hasNodes = data.graph?.nodes?.length > 0;
           const hasLinks = data.graph?.links?.length > 0;
@@ -47,6 +46,13 @@ const Garden = () => {
 
     loadData();
   }, [activeRange, user?.userId]);
+
+  const handleGraphClick = () => {
+    setIsExpanded(prev => !prev);
+    if (!isExpanded) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -88,14 +94,15 @@ const Garden = () => {
         data={{ 
           nodes: reportData?.graph?.nodes || [], 
           links: reportData?.graph?.links || [] 
-        }} 
+        }}
+        isFullscreen={isExpanded}
       />
     );
   };
 
   return (
     <div className="garden-container">
-      <div className="report-header">
+      <div className={`report-header ${isExpanded ? 'hidden' : ''}`}>
         <TimeRangeTabs
           activeRange={activeRange}
           onChange={setActiveRange}
@@ -142,7 +149,10 @@ const Garden = () => {
         )}
       </div>
 
-      <div className="graph-panel">
+      <div 
+        className={`graph-panel ${isExpanded ? 'expanded' : ''}`}
+        onClick={handleGraphClick}
+      >
         <h2 className="panel-title">{activeRange}知识结构图谱</h2>
         <div className="graph-container">
           {renderContent()}

@@ -1078,3 +1078,238 @@ canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+
+
+/* src/styles/main.css */
+:root {
+  --primary-blue: #4a90e2;
+  --primary-hover: #357abd;
+  --text-primary: #2d3436;
+  --text-secondary: #636e72;
+  --bg-light: #f8f9fa;
+  --border-light: #e9ecef;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --transition-fast: 0.25s ease;
+}
+
+.garden-container {
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--bg-light);
+  font-family: 'Helvetica Neue', system-ui, sans-serif;
+}
+
+/* 头部区域 */
+.report-header {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0rem;
+  opacity: 1;
+  transform: translateY(0);
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px var(--shadow-light);
+  padding: 1rem;
+}
+
+.report-header.hidden {
+  opacity: 0;
+  transform: translateY(-1.5rem);
+  pointer-events: none;
+}
+
+/* 统计卡片布局 */
+.stats-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  background: transparent;
+}
+
+/* 知识图谱容器 */
+.graph-panel {
+  position: relative;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px var(--shadow-light);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  height: 65vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-light);
+}
+
+.graph-panel:hover {
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* 全屏模式 */
+.graph-panel.expanded {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  border: none;
+}
+
+/* 图表标题 */
+.panel-title {
+  padding: 1.25rem 2rem;
+  margin: 0;
+  background: linear-gradient(97deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  z-index: 2;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(8px);
+}
+
+/* 图表内容区域 */
+.graph-container {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+  background: #fcfdff;
+}
+
+.graph-panel.expanded .graph-container {
+  height: calc(100vh - 64px);
+  background: #ffffff;
+}
+
+/* 加载状态 */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.96);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--primary-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* 错误提示 */
+.error-banner {
+  padding: 1rem;
+  background: #fff0f0;
+  border: 1px solid #ffcccc;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #dc3545;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+}
+
+/* 按钮样式 */
+.retry-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: 500;
+}
+
+.retry-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
+}
+
+/* 空状态提示 */
+.empty-container,
+.empty-graph {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: #f8fafd;
+  border-radius: 1rem;
+  margin: 2rem 0;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(240, 240, 240, 0.8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(180, 180, 180, 0.6);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.8);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .garden-container {
+    padding: 1rem;
+  }
+  
+  .panel-title {
+    font-size: 1.25rem;
+    padding: 1rem;
+  }
+  
+  .graph-panel {
+    height: 55vh;
+  }
+  
+  .stats-panel {
+    grid-template-columns: 1fr;
+  }
+}

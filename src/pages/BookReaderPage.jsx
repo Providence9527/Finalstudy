@@ -87,6 +87,7 @@ export default function BookReaderPage() {
         await saveReadingProgress({
           userId: user.userId,
           bookId: id,
+          bookInfo: state.bookMeta.bookInfo,
           title: state.bookMeta.title || '未知文档',
           author: state.bookMeta.author || '未知作者',
           fmt: state.bookMeta.fmt,

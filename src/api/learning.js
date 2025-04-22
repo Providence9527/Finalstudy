@@ -198,6 +198,7 @@ export const saveReadingProgress = async (data) => {
     body: JSON.stringify({
       userId: data.userId,
       bookId: data.bookId,
+      bookInfo: data.bookInfo,
       title: data.title,
       author: data.author,
       fmt:data.fmt,
