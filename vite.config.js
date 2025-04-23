@@ -22,14 +22,14 @@ export default defineConfig({
   ],
   
   // 核心改动：base路径强制指定为根目录（兼容无域名部署）
-  base: '/',  // 确保不以斜杠结尾[1](@ref)
+  base: '/',  // 确保不以斜杠结尾
 
   build: {
     outDir: 'dist',
     assetsDir: 'static',
     minify: 'terser',
     sourcemap: false,
-    // 新增：解决Chunk文件路径错误
+    // 解决Chunk文件路径错误
     rollupOptions: {
       output: {
         entryFileNames: 'static/[name]-[hash].js',

@@ -14,12 +14,12 @@ export const fetchLearningStats = async (userId) => {
   if (!response.ok) throw new Error('获取数据失败');
   
   const { data } = await response.json(); // 解构data字段
-  
+  console.log("api取回时长",data)
   // 安全访问嵌套数据
   return {
     coursesCompleted: data?.completed_courses || 0,
     dailyStudy: Object.values(data?.daily_study_minutes || {}).reduce((a, b) => (a || 0) + (b || 0), 0),
-    totalTime: Object.values(data?.total_study_minutes || {}).reduce((a, b) => (a || 0) + (b || 0), 0),
+    totalTime: Object.values(data?.history_study_minutes || {}).reduce((a, b) => (a || 0) + (b || 0), 0),
     weeklyGoal: 600,
     dailyGoal: 120
   };
