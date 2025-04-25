@@ -29,17 +29,7 @@ export const fetchOngoingCourses = async (userId) => {
     const response = await fetch(`/api/users/${userId}/progress?status=ongoing`);
     const { data } = await handleResponse(response);
     
-    // console.log(data.map(item => ({
 
-    //   book_id: item.book_id, 
-    //   title: item.title,
-    //   author: item.author,
-    //   fmt: item.fmt,
-    //   progress: item.progress,
-    //   last_viewed: item.last_viewed?.$date 
-    //     ? new Date(item.last_viewed.$date) 
-    //     : new Date()
-    // })))
     return data.map(item => ({
 
       book_id: item.book_id, 
