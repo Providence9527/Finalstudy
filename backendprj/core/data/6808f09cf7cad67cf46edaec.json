@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "gancao",
+      "name": "甘草",
+      "group": "herb"
+    },
+    {
+      "id": "li_shizhen",
+      "name": "李时珍",
+      "group": "author"
+    },
+    {
+      "id": "bencao_gangmu",
+      "name": "本草纲目",
+      "group": "text"
+    },
+    {
+      "id": "shanyao",
+      "name": "山药",
+      "group": "herb"
+    },
+    {
+      "id": "danggui",
+      "name": "当归",
+      "group": "herb"
+    },
+    {
+      "id": "huangqin",
+      "name": "黄芩",
+      "group": "herb"
+    },
+    {
+      "id": "fuling",
+      "name": "茯苓",
+      "group": "herb"
+    },
+    {
+      "id": "zexie",
+      "name": "泽泻",
+      "group": "herb"
+    }
+  ],
+  "links": [
+    {
+      "source": "gancao",
+      "target": "bencao_gangmu",
+      "type": "recorded_in"
+    },
+    {
+      "source": "li_shizhen",
+      "target": "bencao_gangmu",
+      "type": "compiled_by"
+    },
+    {
+      "source": "gancao",
+      "target": "li_shizhen",
+      "type": "described_by"
+    },
+    {
+      "source": "shanyao",
+      "target": "bencao_gangmu",
+      "type": "recorded_in"
+    },
+    {
+      "source": "danggui",
+      "target": "bencao_gangmu",
+      "type": "recorded_in"
+    },
+    {
+      "source": "huangqin",
+      "target": "bencao_gangmu",
+      "type": "recorded_in"
+    },
+    {
+      "source": "fuling",
+      "target": "bencao_gangmu",
+      "type": "recorded_in"
+    },
+    {
+      "source": "zexie",
+      "target": "bencao_gangmu",
+      "type": "recorded_in"
+    }
+  ]
+}
