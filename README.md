@@ -3,7 +3,6 @@
 
 ## 系统架构  
 ![系统模块结构图] 
-![image](https://github.com/user-attachments/assets/912b0782-99f8-4fe9-949a-4486d83d1d60)
 *图1-1 系统总体模块结构图*  
 
 ---
@@ -11,8 +10,9 @@
 ## 核心功能  
 
 ### 1. 学习数据仪表盘  
-![仪表盘界面](images/3-3-dashboard.png)  
-*图3-3 学习数据仪表盘界面*  
+![仪表盘界面](![image](https://github.com/user-attachments/assets/571fddbe-3bd2-404b-bca6-b6a8f173c3f2)
+)  
+*学习数据仪表盘界面*  
 - **数据闭环机制**：  
   `行为采集 → 可视化 → 策略调整 → 精准推荐`  
 - **核心指标**：  
