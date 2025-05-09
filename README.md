@@ -1,12 +1,48 @@
-# React + Vite
+# 智能教育云平台  
+**项目地址** ➤ [http://8.134.250.169](http://8.134.250.169)  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 系统架构  
+![系统模块结构图](images/3-2-architecture.png)  
+*图3-2 系统总体模块结构图*  
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 核心功能  
 
-## Expanding the ESLint configuration
+### 1. 学习数据仪表盘  
+![仪表盘界面](images/3-3-dashboard.png)  
+*图3-3 学习数据仪表盘界面*  
+- **数据闭环机制**：  
+  `行为采集 → 可视化 → 策略调整 → 精准推荐`  
+- **核心指标**：  
+  ▸ 实时学习时长（当日/历史双维度统计）  
+  ▸ 教材推荐权重（完成度×复习间隔算法）  
+  ▸ 知识点关联图谱  
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. AI资源探索  
+![AI界面](images/3-4-ai.png)  
+*图3-4 AI资源探索界面*  
+- 大模型驱动的对话系统  
+- 学习路径智能规划  
+- 历史对话存档与回溯  
+- 资源获取路径分析  
+
+### 3. 共享书城  
+![书城界面](images/3-5-library.png)  
+*图3-5 共享书城界面*  
+```markdown
+1. 筛选维度：学科/出版社/文件格式/标签
+2. 卡片式教材展示
+3. 一键加入书架功能
+4. 模糊搜索（支持拼音首字母检索）
+4. 个性书架
+images/3-6-bookshelf.png
+图3-6 个性书架界面
+
+自定义文件夹分类
+预设「我喜欢的书籍」专区
+最近阅读进度云端同步
+本地书籍上传（支持epub/pdf/txt）
+5. 教材阅读器
+images/3-7-reader.png
+图3-7 教材阅读器界面
