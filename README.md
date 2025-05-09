@@ -2,8 +2,9 @@
 **项目地址** ➤ [http://8.134.250.169](http://8.134.250.169)  
 
 ## 系统架构  
-![系统模块结构图](images/3-2-architecture.png)  
-*图3-2 系统总体模块结构图*  
+![系统模块结构图] 
+![image](https://github.com/user-attachments/assets/912b0782-99f8-4fe9-949a-4486d83d1d60)
+*图1-1 系统总体模块结构图*  
 
 ---
 
