@@ -10,7 +10,7 @@
 ## 核心功能  
 
 ### 1. 学习数据仪表盘  
-![仪表盘界面](![image](https://github.com/user-attachments/assets/571fddbe-3bd2-404b-bca6-b6a8f173c3f2)
+![仪表盘界面](https://github.com/user-attachments/assets/571fddbe-3bd2-404b-bca6-b6a8f173c3f2
 )  
 *学习数据仪表盘界面*  
 - **数据闭环机制**：  
