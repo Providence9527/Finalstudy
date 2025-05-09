@@ -2,7 +2,7 @@
 **项目地址** ➤ [http://8.134.250.169](http://8.134.250.169)  
 
 ## 系统架构  
-![系统模块结构图](https://github.com/user-attachments/assets/0bfce92a-50e1-405c-ac70-202e58ce71da
+![系统模块结构图](https://github.com/user-attachments/assets/1a75e6e9-4e02-49d5-99f1-a2611af8849c
 )
  
 
