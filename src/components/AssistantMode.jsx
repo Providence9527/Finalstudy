@@ -15,10 +15,38 @@ const AssistantMode = ({ isOn, handleToggle }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
+  const scrollTimeout = useRef(null);
+
+  // 增强版滚动控制
+  const maintainScroll = useCallback((forceScroll = false) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // 计算是否接近底部（保留50px缓冲）
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+    
+    // 当强制滚动或接近底部时自动滚动
+    if (forceScroll || isNearBottom) {
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest"
+        });
+      }, 50);
+    }
+  }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    maintainScroll(true); // 新消息到达时强制滚动
   }, [messages, loading]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,149 +100,157 @@ const AssistantMode = ({ isOn, handleToggle }) => {
   }, []);
 
   return (
-    <div className="mode-tab-content">
-      <div className="mode-content" style={{ height: '100%', overflow: 'hidden' }}>
-        <div className="content-item">
-          <div className="assistant-chat" style={{ 
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column' 
-          }}>
-            <div 
-              className="chat-history" 
-              style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '16px',
-                backgroundColor: '#f5f5f5',
-                cursor: 'text'
-              }}
-              onClick={handleChatAreaClick}
-            >
-              {!isInitialized ? (
-                <div style={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  color: '#666',
-                  cursor: 'pointer'
-                }}>
-                  <SmartToyIcon style={{ fontSize: 64, marginBottom: 16, color: '#4CAF50' }}/>
-                  <h2 style={{ marginBottom: 8 }}>智能学习助手</h2>
-                  <p>输入您的问题开始对话</p>
-                </div>
-              ) : (
-                <>
-                  {messages.map((msg, index) => (
-                    <div 
-                      key={index} 
-                      onClick={handleChatAreaClick}
-                      style={{ 
-                        display: 'flex',
-                        justifyContent: msg.isAI ? 'flex-start' : 'flex-end',
-                        marginBottom: 16
-                      }}
-                    >
-                      {msg.isAI && (
-                        <div style={{ marginRight: 8 }}>
-                          <PersonIcon style={{ 
-                            backgroundColor: '#4CAF50',
-                            color: 'white',
-                            borderRadius: '50%',
-                            padding: 4
-                          }}/>
-                        </div>
-                      )}
-                      <div style={{
-                        maxWidth: '70%',
-                        padding: '12px 16px',
-                        borderRadius: msg.isAI ? '18px 18px 18px 4px' : '18px 18px 4px 18px',
-                        backgroundColor: msg.isAI ? '#fff' : '#2196F3',
-                        color: msg.isAI ? '#333' : '#fff',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                      }}>
-                        {msg.text}
-                      </div>
-                      {!msg.isAI && (
-                        <div style={{ marginLeft: 8 }}>
-                          <PersonIcon style={{ 
-                            backgroundColor: '#2196F3',
-                            color: 'white',
-                            borderRadius: '50%',
-                            padding: 4
-                          }}/>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {loading && (
-                    <div style={{ 
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: 16
-                    }}>
-                      <CircularProgress size={24} style={{ marginRight: 8 }}/>
-                      <span>正在生成回答...</span>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef}/>
-                </>
-              )}
-            </div>
-            <form onSubmit={handleSubmit} style={{
-              borderTop: '1px solid #e0e0e0',
-              padding: '16px',
-              backgroundColor: 'white'
+    <div 
+      className="assistant-container"
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative'
+      }}
+    >
+      {/* 可滚动的内容区域 */}
+      <div 
+        ref={containerRef}
+        className="scrollable-content"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '16px 16px 0',
+          position: 'relative',
+          scrollBehavior: 'smooth',
+          overscrollBehavior: 'contain'
+        }}
+      >
+        {!isInitialized ? (
+          <div 
+            className="welcome-prompt"
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center',
+              color: '#666'
+            }}
+          >
+            <SmartToyIcon style={{ fontSize: 64, marginBottom: 16, color: '#4CAF50' }}/>
+            <h2 style={{ marginBottom: 8 }}>智能学习助手</h2>
+            <p>输入您的问题开始对话</p>
+          </div>
+        ) : (
+          <>
+            {/* 消息列表容器 */}
+            <div style={{ 
+              minHeight: 'calc(100% - 40px)', // 保留输入框高度
+              paddingBottom: 40 // 防止底部内容被遮挡
             }}>
-              <div style={{
-                display: 'flex',
-                gap: 8,
-                alignItems: 'center'
-              }}>
-                <input
-                  type="text"
-                  placeholder="输入你的问题..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  ref={inputRef}
-                  style={{
-                    flex: 1,
-                    padding: '12px 16px',
-                    borderRadius: 24,
-                    border: '1px solid #e0e0e0',
-                    outline: 'none',
-                    fontSize: 14
-                  }}
-                />
-                <IconButton 
-                  type="submit" 
-                  color="primary"
-                  disabled={loading}
+              {messages.map((msg, index) => (
+                <div 
+                  key={index} 
                   style={{ 
-                    backgroundColor: '#2196F3',
-                    color: 'white',
-                    '&:hover': { backgroundColor: '#1976D2' }
+                    display: 'flex',
+                    justifyContent: msg.isAI ? 'flex-start' : 'flex-end',
+                    marginBottom: 16,
+                    animation: 'messageAppear 0.3s ease-out'
                   }}
                 >
-                  <SendIcon />
-                </IconButton>
-              </div>
-              {error && (
-                <div style={{ 
-                  color: '#f44336',
-                  fontSize: 12,
-                  marginTop: 8,
-                  textAlign: 'center'
-                }}>
-                  {error}
+                  {/* 消息气泡 */}
+                  <div
+                    className="message-bubble"
+                    style={{
+                      maxWidth: 'min(75%, 600px)',
+                      padding: '12px 16px',
+                      borderRadius: msg.isAI ? '18px 18px 18px 4px' : '18px 18px 4px 18px',
+                      backgroundColor: msg.isAI ? '#fff' : '#2196F3',
+                      color: msg.isAI ? '#333' : '#fff',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    {msg.text}
+                  </div>
                 </div>
-              )}
-            </form>
+              ))}
+              <div ref={messagesEndRef} style={{ height: 1 }} />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* 固定在底部的输入区域 */}
+      <div 
+        className="input-container"
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          backgroundColor: 'white',
+          borderTop: '1px solid #e0e0e0',
+          zIndex: 2,
+          boxShadow: '0 -4px 12px rgba(0,0,0,0.05)'
+        }}
+      >
+        <form onSubmit={handleSubmit} style={{ padding: 16 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input
+              type="text"
+              placeholder="输入你的问题..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              ref={inputRef}
+              onClick={handleChatAreaClick}
+              style={{
+                flex: 1,
+                padding: '12px 16px',
+                borderRadius: 24,
+                border: '1px solid #e0e0e0',
+                outline: 'none',
+                fontSize: 14,
+                backgroundColor: '#fff',
+                transition: 'box-shadow 0.2s'
+              }}
+            />
+            <IconButton 
+              type="submit" 
+              color="primary"
+              disabled={loading}
+              style={{ 
+                backgroundColor: '#2196F3',
+                color: 'white',
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  backgroundColor: '#1976D2'
+                }
+              }}
+            >
+              <SendIcon />
+            </IconButton>
           </div>
-        </div>
+          {error && (
+            <div 
+              style={{ 
+                color: '#f44336',
+                fontSize: 12,
+                marginTop: 8,
+                textAlign: 'center'
+              }}
+            >
+              {error}
+            </div>
+          )}
+          {loading && (
+            <div style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              paddingTop: 8
+            }}>
+              <CircularProgress size={20} style={{ marginRight: 8 }}/>
+              <span>正在生成回答...</span>
+            </div>
+          )}
+        </form>
       </div>
     </div>
   );

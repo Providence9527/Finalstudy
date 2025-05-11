@@ -426,6 +426,7 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
                   transform: `scale(${scale})`,
                   transformOrigin: '0 0',
                   width: '100%',
+                  minWidth: baseSize.current.width,
                   height: '100%', 
                   position: 'absolute', 
                   top: 0,
@@ -433,6 +434,18 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
 
                 }}
               >
+                {/* 添加缩放补偿层 */}
+                <div style={{ 
+                    width: `${100/scale}%`,
+                    height: `${100/scale}%`,
+                    transformOrigin: '0 0',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box',
+                    transform: `scale(${scale})`,
+                    pointerEvents: 'none'
+                  }}>
+                <div style={{ pointerEvents: 'auto' }}>
                 {activeTab === 'settings' ? (
                   <div className="settings-panel">
                     {Object.entries(MODE_TABS).map(([modeKey, config]) => (
@@ -461,6 +474,8 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
                 ) : (
                   generateTabs().find(t => t.id === activeTab)?.component
                 )}
+                </div>
+                </div>
               </div>
             </div>
           </div>
