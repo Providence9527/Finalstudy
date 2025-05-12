@@ -1,10 +1,18 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   CircularProgress,
-  IconButton
+  IconButton, 
+  Box,
+  Avatar,
+  Typography,
+  List,
+  ListItem,
+  ListItemAvatar
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import Markdown from '@uiw/react-markdown-preview';
+import PersonIcon from '@mui/icons-material/Person';
 
 const AssistantMode = ({ isOn, handleToggle }) => {
   const [messages, setMessages] = useState([]);
@@ -14,9 +22,7 @@ const AssistantMode = ({ isOn, handleToggle }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const containerRef = useRef(null);
 
-  // 滚动控制逻辑
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
@@ -32,169 +38,255 @@ const AssistantMode = ({ isOn, handleToggle }) => {
     }
   }, [messages, isInitialized, scrollToBottom]);
 
-    // 完整的API请求
-    const getAIResponse = async (message) => {
-      try {
-        const API_TOKEN = import.meta.env.VITE_API_TOKEN;
-        const response = await fetch(import.meta.env.VITE_API_MODEL_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${API_TOKEN}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: import.meta.env.VITE_API_MODEL,
-            messages: [{ role: "user", content: message }],
-            max_tokens: 512,
-            temperature: 0.7
-          })
-        });
-  
-        if (!response.ok) {
-          throw new Error(`请求失败，状态码：${response.status}`);
-        }
-  
-        const data = await response.json();
-        return data.choices[0]?.message?.content || "未获取到有效回答";
-      } catch (error) {
-        console.error("API请求错误:", error);
-        throw error;
+  const getAIResponse = async (message) => {
+    try {
+      const API_TOKEN = import.meta.env.VITE_API_TOKEN;
+      const response = await fetch(import.meta.env.VITE_API_MODEL_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: import.meta.env.VITE_API_MODEL,
+          messages: [{ role: "user", content: message }],
+          max_tokens: 512,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`请求失败，状态码：${response.status}`);
       }
-    };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      if (!inputMessage.trim() || loading) return;
-  
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // 添加用户消息
-        const userMessage = { text: inputMessage, isAI: false };
-        setMessages(prev => [...prev, userMessage]);
-        setInputMessage('');
-        if (!isInitialized) setIsInitialized(true);
-  
-        // 获取AI响应
-        const aiResponse = await getAIResponse(inputMessage);
-        
-        // 添加AI消息
-        setMessages(prev => [...prev, { 
-          text: aiResponse, 
-          isAI: true 
-        }]);
-      } catch (err) {
-        setError(err.message);
-        setMessages(prev => [...prev, { 
-          text: `服务错误：${err.message}`,
-          isAI: true 
-        }]);
-      } finally {
-        setLoading(false);
-        inputRef.current?.focus();
-      }
-    };
-    const handleChatAreaClick = useCallback(() => {
+
+      const data = await response.json();
+      return data.choices[0]?.message?.content || "未获取到有效回答";
+    } catch (error) {
+      console.error("API请求错误:", error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!inputMessage.trim() || loading) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const userMessage = { text: inputMessage, isAI: false };
+      setMessages(prev => [...prev, userMessage]);
+      setInputMessage('');
+      if (!isInitialized) setIsInitialized(true);
+
+      const aiResponse = await getAIResponse(inputMessage);
+      
+      setMessages(prev => [...prev, { 
+        text: aiResponse, 
+        isAI: true 
+      }]);
+    } catch (err) {
+      setError(err.message);
+      setMessages(prev => [...prev, { 
+        text: `服务错误：${err.message}`,
+        isAI: true 
+      }]);
+    } finally {
+      setLoading(false);
       inputRef.current?.focus();
-    }, []);
+    }
+  };
+
+  const handleChatAreaClick = useCallback(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
-    <div 
-      style={{
-        height: '100vh', // 确保占满整个视口
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        position: 'relative'
-      }}
-    >
+    <div style={{ 
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      boxSizing: 'border-box'
+    }}>
       {/* 聊天内容区域 */}
-      <div
-        ref={containerRef}
-        style={{
+      <div style={{ 
+        height: '40vh',
+        position: 'relative', 
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        <div style={{ 
           flex: 1,
-          overflowY: 'auto',
           padding: '16px',
           backgroundColor: '#f5f5f5',
-          position: 'relative',
-          '&::-webkit-scrollbar': {
-            width: '8px'
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '4px'
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888',
-            borderRadius: '4px',
-            '&:hover': {
-              backgroundColor: '#555'
-            }
-          }
-        }}
-      >
-        {!isInitialized ? (
-          <div 
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center'
-            }}
-          >
-            <SmartToyIcon 
-              style={{ 
-                fontSize: 64, 
-                color: '#4CAF50', 
-                marginBottom: 16 
-              }}
-            />
-            <h2 style={{ color: '#333', margin: '8px 0' }}>智能学习助手</h2>
-            <p style={{ color: '#666' }}>输入您的问题开始对话</p>
-          </div>
-        ) : (
-          <div style={{ minHeight: '100%', paddingBottom: '80px' }}> {/* 底部留出输入区域空间 */}
-            {messages.map((msg, index) => (
-              <div
-                key={index}
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0
+        }}>
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            overflow: 'hidden'
+          }}>
+            {!isInitialized ? (
+              <div 
                 style={{
-                  marginBottom: 16,
                   display: 'flex',
-                  justifyContent: msg.isAI ? 'flex-start' : 'flex-end',
-                  animation: 'messageAppear 0.3s ease-out'
+                  height: '100%',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center'
                 }}
               >
-                <div
-                  style={{
-                    maxWidth: 'min(75%, 600px)',
-                    padding: '12px 16px',
-                    borderRadius: msg.isAI ? '18px 18px 18px 4px' : '18px 18px 4px 18px',
-                    backgroundColor: msg.isAI ? '#ffffff' : '#2196F3',
-                    color: msg.isAI ? '#333' : '#fff',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    wordBreak: 'break-word',
-                    lineHeight: 1.5
+                <SmartToyIcon 
+                  style={{ 
+                    fontSize: 64, 
+                    color: '#4CAF50', 
+                    marginBottom: 16 
                   }}
-                >
-                  {msg.text}
-                </div>
+                />
+                <h2 style={{ color: '#333', margin: '8px 0' }}>智能学习助手</h2>
+                <p style={{ color: '#666' }}>输入您的问题开始对话</p>
               </div>
-            ))}
-            <div ref={messagesEndRef} style={{ height: 1 }} />
+            ) : (
+              <div style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 0,
+                overflow: 'hidden'
+              }}>
+                <Box sx={{
+                  flex: 1,
+                  overflowY: 'scroll',
+                  height: '100%',
+                  p: 2,
+                  bgcolor: 'background.paper',
+                  '& pre': { 
+                    bgcolor: 'action.hover', 
+                    borderRadius: 1, 
+                    p: 2,
+                    overflowX: 'auto'
+                  },
+                  '& code': { 
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem'
+                  },
+                  '&::-webkit-scrollbar': {
+                    width: '8px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: '#f1f1f1',
+                    borderRadius: '4px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#888',
+                    borderRadius: '4px',
+                    '&:hover': {
+                      backgroundColor: '#555'
+                    }
+                  }
+                }}>
+                  <List sx={{ 
+                    minHeight: '100%',
+                    '& .MuiListItem-root': {
+                      alignItems: 'flex-start',
+                      animation: 'messageAppear 0.3s ease-out'
+                    }
+                  }}>
+                    {messages.map((msg, index) => (
+                      <ListItem 
+                        key={index} 
+                        disablePadding
+                        sx={{
+                          display: 'flex',
+                          justifyContent: msg.isAI ? 'flex-start' : 'flex-end',
+                          mb: 2
+                        }}
+                      >
+                        {msg.isAI && (
+                          <ListItemAvatar sx={{ 
+                            minWidth: 40,
+                            alignSelf: 'flex-start'
+                          }}>
+                            <Avatar sx={{ 
+                              bgcolor: '#4CAF50', 
+                              width: 32, 
+                              height: 32 
+                            }}>
+                              <SmartToyIcon fontSize="small" />
+                            </Avatar>
+                          </ListItemAvatar>
+                        )}
+                        <Box
+                          component={Markdown}
+                          source={msg.text}
+                          sx={{
+                            maxWidth: 'min(75%, 600px)',
+                            p: 1.5,
+                            borderRadius: 2,
+                            bgcolor: msg.isAI ? 'background.default' : 'primary.main',
+                            color: msg.isAI ? 'text.primary' : 'primary.contrastText',
+                            boxShadow: 1,
+                            '& a': { 
+                              color: msg.isAI ? 'primary.main' : '#fff',
+                              textDecoration: 'underline'
+                            },
+                            '& ul': {
+                              pl: 2,
+                              mb: 1
+                            },
+                            '& ol': {
+                              pl: 2,
+                              mb: 1
+                            },
+                            '& blockquote': {
+                              borderLeft: '4px solid',
+                              borderColor: msg.isAI ? 'primary.main' : '#fff',
+                              pl: 2,
+                              ml: 0,
+                              color: msg.isAI ? 'text.secondary' : '#fff'
+                            }
+                          }}
+                        />
+                        {!msg.isAI && (
+                          <ListItemAvatar sx={{ 
+                            minWidth: 40, 
+                            ml: 1,
+                            alignSelf: 'flex-start'
+                          }}>
+                            <Avatar sx={{ 
+                              bgcolor: '#2196F3', 
+                              width: 32, 
+                              height: 32 
+                            }}>
+                              <PersonIcon fontSize="small" />
+                            </Avatar>
+                          </ListItemAvatar>
+                        )}
+                      </ListItem>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </List>
+                </Box>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* 固定输入区域 */}
+      {/* 输入区域 */}
       <div 
         style={{
-          position: 'sticky',
+          position: 'sticky', 
           bottom: 0,
-          backgroundColor: '#fff',
+          background: '#fff',
           borderTop: '1px solid #e0e0e0',
           padding: '16px',
           zIndex: 1000,
