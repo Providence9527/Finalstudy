@@ -446,34 +446,44 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
                     pointerEvents: 'none'
                   }}>
                 <div style={{ pointerEvents: 'auto' }}>
-                {activeTab === 'settings' ? (
-                  <div className="settings-panel">
-                    {Object.entries(MODE_TABS).map(([modeKey, config]) => (
-                      <div key={modeKey} className="mode-item">
-                        <label>{config.label}</label>
-                        <Switch
-                          isOn={modes[modeKey]}
-                          handleToggle={() => modes[modeKey] ? toggleMode(modeKey) : toggleMode(modeKey)}
-                        />
-                      </div>
-                    ))}
-                    <div 
-                      className="opacity-control"
-                      onMouseDown={e => e.stopPropagation()}
+                {generateTabs().map(tab => (
+                    <div
+                      key={tab.id}
+                      style={{
+                        display: tab.id === activeTab ? 'block' : 'none',
+                        height: '100%',
+                        overflow: 'auto'
+                      }}
                     >
-                      <label>窗口透明度：{Math.round(opacity * 100)}%</label>
-                      <Slider
-                        value={opacity * 100}
-                        onChange={handleOpacityChange}
-                        onMouseDown={e => e.stopPropagation()}
-                        min={30}
-                        max={100}
-                      />
-                    </div>
+                      {tab.id === 'settings' ? (
+                        <div className="settings-panel">
+                          {Object.entries(MODE_TABS).map(([modeKey, config]) => (
+                            <div key={modeKey} className="mode-item">
+                              <label>{config.label}</label>
+                              <Switch
+                                isOn={modes[modeKey]}
+                                handleToggle={() => toggleMode(modeKey)}
+                              />
+                            </div>
+                          ))}
+                          <div 
+                            className="opacity-control"
+                            onMouseDown={e => e.stopPropagation()}
+                          >
+                            <label>窗口透明度：{Math.round(opacity * 100)}%</label>
+                            <Slider
+                              value={opacity * 100}
+                              onChange={handleOpacityChange}
+                              min={30}
+                              max={100}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        tab.component
+                      )}
                   </div>
-                ) : (
-                  generateTabs().find(t => t.id === activeTab)?.component
-                )}
+                ))}
                 </div>
                 </div>
               </div>
