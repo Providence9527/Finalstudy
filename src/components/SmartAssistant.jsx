@@ -322,12 +322,17 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
           ref={dragRef}
           className="floating-ball"
           style={{ 
-            display: isExpanded ? 'none' : 'block',
+            display: isExpanded ? 'none' : 'flex',
             transform: `translate(${position.x}px, ${position.y}px)`,
             opacity,
             position: 'fixed',
             cursor: isDragging ? 'grabbing' : 'grab',
             zIndex: 10000,
+            width: '50px',
+            height: '50px',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontSize: '24px',
             transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
           }}
           onClick={(e) => {
