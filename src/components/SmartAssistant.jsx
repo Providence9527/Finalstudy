@@ -309,144 +309,146 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
 
   return (
     <div className="smart-assistant-container">
-      {!isExpanded ? (
-        <DraggableCore 
-          nodeRef={dragRef}
-          onStart={handleDragStart}
-          onDrag={handleDrag}
-          onStop={handleDragEnd}
-          bounds="parent"
-          enableUserSelectHack={false}
+      {/* 悬浮球模式 */}
+      <DraggableCore 
+        nodeRef={dragRef}
+        onStart={handleDragStart}
+        onDrag={handleDrag}
+        onStop={handleDragEnd}
+        bounds="parent"
+        enableUserSelectHack={false}
+      >
+        <div
+          ref={dragRef}
+          className="floating-ball"
+          style={{ 
+            display: isExpanded ? 'none' : 'block',
+            transform: `translate(${position.x}px, ${position.y}px)`,
+            opacity,
+            position: 'fixed',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            zIndex: 10000,
+            transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
+          }}
+          onClick={(e) => {
+            const dx = Math.abs(e.clientX - dragStartPosition.current.x);
+            const dy = Math.abs(e.clientY - dragStartPosition.current.y);
+            if (dx < 5 && dy < 5) setIsExpanded(true);
+          }}
         >
-          <div
-            ref={dragRef}
-            className="floating-ball"
-            style={{ 
-              transform: `translate(${position.x}px, ${position.y}px)`,
-              opacity,
-              position: 'fixed',
-              cursor: isDragging ? 'grabbing' : 'grab',
-              zIndex: 10000,
-              transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
-            }}
-            onClick={(e) => {
-              const dx = Math.abs(e.clientX - dragStartPosition.current.x);
-              const dy = Math.abs(e.clientY - dragStartPosition.current.y);
-              if (dx < 5 && dy < 5) setIsExpanded(true);
-            }}
-          >
-            🦾
-          </div>
-        </DraggableCore>
-      ) : (
-        <DraggableCore 
-          nodeRef={dragRef}
-          onStart={handleDragStart}
-          onDrag={handleDrag}
-          onStop={handleDragEnd}
-          bounds="parent"
-          enableUserSelectHack={false}
+          🦾
+        </div>
+      </DraggableCore>
+  
+      {/* 展开模式 */}
+      <DraggableCore 
+        nodeRef={dragRef}
+        onStart={handleDragStart}
+        onDrag={handleDrag}
+        onStop={handleDragEnd}
+        bounds="parent"
+        enableUserSelectHack={false}
+      >
+        <div
+          ref={dragRef}
+          className="assistant-window"
+          style={{ 
+            display: isExpanded ? 'block' : 'none',
+            transform: `translate(${position.x}px, ${position.y}px)`,
+            opacity,
+            width: size.width,
+            height: size.height,
+            zIndex: 10001,
+            position: 'fixed',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            transition: isDragging ? 'none' : 'transform 0.15s ease-out',
+            left: 0,
+            top: 0,
+            transformOrigin: '0 0'
+          }}
         >
-          <div
-            ref={dragRef}
-            className="assistant-window"
-            style={{ 
-              transform: `translate(${position.x}px, ${position.y}px)`,
-              opacity,
-              width: size.width,
-              height: size.height,
-              zIndex: 10001,
-              position: 'fixed',
-              cursor: isDragging ? 'grabbing' : 'grab',
-              transition: isDragging ? 'none' : 'transform 0.15s ease-out',
-              left: 0,
-              top: 0,
-              transformOrigin: '0 0'
-            }}
-          >
-            {/* 调整大小手柄 */}
-            <div className="resize-handle top" onMouseDown={handleResizeMouseDown('top')} />
-            <div className="resize-handle right" onMouseDown={handleResizeMouseDown('right')} />
-            <div className="resize-handle bottom" onMouseDown={handleResizeMouseDown('bottom')} />
-            <div className="resize-handle left" onMouseDown={handleResizeMouseDown('left')} />
-            <div className="resize-handle top-right" onMouseDown={handleResizeMouseDown('top-right')} />
-            <div className="resize-handle bottom-right" onMouseDown={handleResizeMouseDown('bottom-right')} />
-            <div className="resize-handle bottom-left" onMouseDown={handleResizeMouseDown('bottom-left')} />
-            <div className="resize-handle top-left" onMouseDown={handleResizeMouseDown('top-left')} />
-
-            <div className="window-header">
-              <div className="tabs">
-                {generateTabs().map(tab => (
-                  <button
-                    key={tab.id}
-                    className={`tab ${activeTab === tab.id ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveTab(tab.id);
-                    }}
-                  >
-                    {tab.label}
-                    {tab.id !== 'settings' && (
-                      <span 
-                        className="close-tab"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleMode(Object.keys(MODE_TABS).find(k => MODE_TABS[k].id === tab.id));
-                        }}
-                      >
-                        ×
-                      </span>
-                    )}
-                  </button>
-                ))}
-              </div>
-              <button 
-                className="close-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpanded(false);
-                }}
-              >
-                ×
-              </button>
+          {/* 调整大小手柄 */}
+          <div className="resize-handle top" onMouseDown={handleResizeMouseDown('top')} />
+          <div className="resize-handle right" onMouseDown={handleResizeMouseDown('right')} />
+          <div className="resize-handle bottom" onMouseDown={handleResizeMouseDown('bottom')} />
+          <div className="resize-handle left" onMouseDown={handleResizeMouseDown('left')} />
+          <div className="resize-handle top-right" onMouseDown={handleResizeMouseDown('top-right')} />
+          <div className="resize-handle bottom-right" onMouseDown={handleResizeMouseDown('bottom-right')} />
+          <div className="resize-handle bottom-left" onMouseDown={handleResizeMouseDown('bottom-left')} />
+          <div className="resize-handle top-left" onMouseDown={handleResizeMouseDown('top-left')} />
+  
+          <div className="window-header">
+            <div className="tabs">
+              {generateTabs().map(tab => (
+                <button
+                  key={tab.id}
+                  className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveTab(tab.id);
+                  }}
+                >
+                  {tab.label}
+                  {tab.id !== 'settings' && (
+                    <span 
+                      className="close-tab"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleMode(Object.keys(MODE_TABS).find(k => MODE_TABS[k].id === tab.id));
+                      }}
+                    >
+                      ×
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
-
-            <div 
-              className="window-content-wrapper"
-              style={{
-                width: '100%',
-                height: 'calc(100vh - 40px)',
-                overflow: 'hidden',
-                position: 'relative'
+            <button 
+              className="close-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
               }}
             >
-              <div
-                className="window-content"
-                style={{ 
-                  transform: `scale(${scale})`,
+              ×
+            </button>
+          </div>
+  
+          <div 
+            className="window-content-wrapper"
+            style={{
+              width: '100%',
+              height: 'calc(100vh - 40px)',
+              overflow: 'hidden',
+              position: 'relative'
+            }}
+          >
+            <div
+              className="window-content"
+              style={{ 
+                transform: `scale(${scale})`,
+                transformOrigin: '0 0',
+                width: '100%',
+                minWidth: baseSize.current.width,
+                height: '100%', 
+                position: 'absolute', 
+                top: 0,
+                left: 0
+              }}
+            >
+              {/* 添加缩放补偿层 */}
+              <div style={{ 
+                  width: `${100/scale}%`,
+                  height: `${100/scale}%`,
                   transformOrigin: '0 0',
-                  width: '100%',
-                  minWidth: baseSize.current.width,
-                  height: '100%', 
-                  position: 'absolute', 
-                  top: 0,
-                  left: 0
-
-                }}
-              >
-                {/* 添加缩放补偿层 */}
-                <div style={{ 
-                    width: `${100/scale}%`,
-                    height: `${100/scale}%`,
-                    transformOrigin: '0 0',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxSizing: 'border-box',
-                    transform: `scale(${scale})`,
-                    pointerEvents: 'none'
-                  }}>
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxSizing: 'border-box',
+                  transform: `scale(${scale})`,
+                  pointerEvents: 'none'
+                }}>
                 <div style={{ pointerEvents: 'auto' }}>
-                {generateTabs().map(tab => (
+                  {generateTabs().map(tab => (
                     <div
                       key={tab.id}
                       style={{
@@ -482,15 +484,14 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
                       ) : (
                         tab.component
                       )}
-                  </div>
-                ))}
-                </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </DraggableCore>
-      )}
+        </div>
+      </DraggableCore>
     </div>
   );
 };
