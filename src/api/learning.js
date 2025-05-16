@@ -357,3 +357,62 @@ export const fetchReport = async (userId, period) => {
 };
 
 
+// 笔记模式api
+export const fetchNodeList = async (userId) => {
+  try {
+    const response = await fetch(`/api/users/${userId}/notes/`);
+    if (!response.ok) throw new Error('请求失败');
+    const { data } = await response.json();
+    return data.map(note => ({
+      id: note.note_id,
+      title: note.title,
+      lastViewed: note.lastViewed
+    }));
+  } catch (error) {
+    console.error('获取笔记列表失败:', error);
+    throw error;
+  }
+};
+
+export const deleteNote = async (userId, noteId) => {
+  try {
+    const encodedNoteId = encodeURIComponent(noteId);
+    const response = await fetch(
+      `/api/users/${userId}/notes/${encodedNoteId}/`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return handleResponse(response);
+  } catch (error) {
+    console.error('删除笔记失败:', error);
+    throw error;
+  }
+};
+
+export const createNote = async (userId, title) => {
+  try {
+    const response = await fetch(
+      `/api/users/${userId}/notes/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title })
+      }
+    );
+    const { data } = await handleResponse(response);
+    return {
+      id: data.note_id,
+      title: data.title,
+      createdAt: data.created_at
+    };
+  } catch (error) {
+    console.error('创建笔记失败:', error);
+    throw error;
+  }
+};

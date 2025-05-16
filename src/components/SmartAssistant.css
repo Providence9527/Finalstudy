@@ -229,7 +229,7 @@
   margin-top: -2px !important;
 }
 
-/* 其他模式基础样式 */
+/* 笔记模式基础样式 */
 .note-list,
 .assistant-chat {
   padding: 12px;
@@ -250,4 +250,63 @@
   padding: 8px 12px;
   margin: 5px 0;
   border-radius: 15px;
+}
+
+
+
+.note-mode-container {
+  padding: 20px;
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.note-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.note-list li {
+  padding: 12px;
+  margin: 8px 0;
+  background: #f5f5f5;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+.note-list li:hover {
+  background: #eee;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 0 5px;
+}
+
+.delete-btn:hover {
+  color: #cc0000;
+}
+
+.loading, .error {
+  padding: 10px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.error {
+  color: #cc0000;
+  background: #ffebee;
+  border-radius: 4px;
 }
