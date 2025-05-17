@@ -26,8 +26,17 @@ const NoteMode = () => {
   const loadNotes = async () => {
     try {
       setLoading(true);
-      const data = await fetchNodeList(user.userId);
-      setNotes(data);
+      
+      const rawData = await fetchNodeList(user.userId);
+        
+        // 按照最后查看时间倒序排列
+        const sortedData = rawData.sort((a, b) => {
+          return new Date(b.lastViewed) - new Date(a.lastViewed);
+        });
+        
+        console.log("排序后的笔记数据:", sortedData);
+        setNotes(sortedData);
+
     } catch (error) {
       setError('无法加载笔记列表');
       console.error('加载笔记失败:', error);
@@ -69,6 +78,7 @@ const NoteMode = () => {
       setIsDialogOpen(false);
       setNewNoteTitle('');
       await loadNotes();
+      setError(null);
     } catch (error) {
       console.error('创建笔记失败:', error);
       setError('创建失败，请检查网络连接');
@@ -78,7 +88,8 @@ const NoteMode = () => {
   };
 
   return (
-    <div className="note-mode-container">
+    <div className="note-mode-container" 
+    >
       <div className="note-header">
         <h3>我的笔记</h3>
         <Button 
@@ -95,7 +106,13 @@ const NoteMode = () => {
       {loading && <div className="loading">加载中...</div>}
       {error && <div className="error">{error}</div>}
 
-      <ul className="note-list">
+      <div style={{
+          flex: 1,
+          maxHeight: '40vh',
+          minHeight: 200,
+          overflowY: 'auto'
+        }}>
+          <ul className="note-list">
         {notes.map(note => (
           <li 
             key={note.id}
@@ -116,6 +133,7 @@ const NoteMode = () => {
           </li>
         ))}
       </ul>
+    </div>
 
       {/* 删除确认弹窗 */}
       <Dialog
@@ -149,6 +167,7 @@ const NoteMode = () => {
             onClick={handleDelete}
             color="secondary"
             variant="contained"
+            sx={{ minWidth: 96 }}
             disabled={deleteLoading}
             startIcon={deleteLoading && <CircularProgress size={20} />}
           >

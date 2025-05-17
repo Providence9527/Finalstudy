@@ -156,7 +156,7 @@ export const fetchFilterOptions = async () => {
 
 export const fetchBookContent = async (id) => {
   const response = await fetch(`/api/books/${id}/content/`);
-  console.log("fbc取回:",response)
+  //console.log("fbc取回:",response)
   const responseData = await response.json()
     .catch(error => {
       console.error('[API] 响应解析失败', error);
@@ -365,12 +365,13 @@ export const fetchNodeList = async (userId) => {
     if (!response.ok) throw new Error('请求失败');
     const { data } = await response.json();
     
-    //console.log("后端返回笔记列表如下:",data)
+    console.log("后端返回笔记列表如下:",data)
     return data.map(note => ({
       id: note.note_id,
       title: note.title,
       lastViewed: note.lastViewed
     }));
+
   } catch (error) {
     console.error('获取笔记列表失败:', error);
     throw error;
