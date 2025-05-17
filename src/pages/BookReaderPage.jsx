@@ -118,7 +118,7 @@ export default function BookReaderPage() {
   }, [user, state.bookMeta, id, readingProgress]);
   
   const handlePageChange = (pageNumber) => {
-    console.log('当前页码:', pageNumber);
+    //console.log('当前页码:', pageNumber);
     setCurrentPage(pageNumber);
   };
 

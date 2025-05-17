@@ -84,7 +84,7 @@ export default function PdfViewer({ url, mode = 'pdfjs', onMaxRetry, onProgressC
 
   const handleDocumentLoad = ({ doc }) => {
     setTotalPages(doc.numPages);
-    console.log('[PDF.js] 文档结构加载完成，总页数:', doc.numPages);
+    //console.log('[PDF.js] 文档结构加载完成，总页数:', doc.numPages);
   };
 
   // 页面变化处理（增强版监控）

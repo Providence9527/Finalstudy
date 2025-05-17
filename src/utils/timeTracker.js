@@ -22,7 +22,7 @@ export class TimeTracker {
         duration: Math.round(duration / 1000), // 转为秒
         timestamp: new Date().toISOString()
       };
-       console.log("发送时间更新请求",data )
+       //console.log("发送时间更新请求",data )
       //console.log('请求方法:', new URL(`${API_URL}/users/${this.userId}/learning-time/`).protocol);
       // 使用sendBeacon可靠发送数据
       navigator.sendBeacon(

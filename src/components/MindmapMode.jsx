@@ -18,11 +18,11 @@ const MindmapMode = ({ data, lastUpdated, onRefresh }) => {
   const transformer = useRef(new Transformer());
 
   // 增强版渲染逻辑
-  useEffect(() => {
-    console.log('[Mindmap] 收到新数据', 
-              `变更标识: ${data !== dataRef.current}`,
-              `时间标识: ${lastUpdated !== lastUpdatedRef.current}`,
-              `长度: ${data?.length}`, `时间戳: ${lastUpdated}`);
+   useEffect(() => {
+  //   console.log('[Mindmap] 收到新数据', 
+  //             `变更标识: ${data !== dataRef.current}`,
+  //             `时间标识: ${lastUpdated !== lastUpdatedRef.current}`,
+  //             `长度: ${data?.length}`, `时间戳: ${lastUpdated}`);
     dataRef.current = data;
     let isMounted = true;
     let animationFrame;
@@ -30,18 +30,18 @@ const MindmapMode = ({ data, lastUpdated, onRefresh }) => {
     const renderMindmap = () => {
       try {
         console.group('脑图渲染流程');
-        console.log('当前数据状态:', data ? `有效数据（长度${data.length}）` : '空数据');
+        //console.log('当前数据状态:', data ? `有效数据（长度${data.length}）` : '空数据');
 
         // 阶段1: 清理旧实例
         if (mmRef.current) {
-          console.log('开始销毁旧实例');
+          //console.log('开始销毁旧实例');
           mmRef.current.destroy();
           // 手动清除SVG内容
           while (svgRef.current?.firstChild) {
             svgRef.current.removeChild(svgRef.current.firstChild);
           }
           mmRef.current = null;
-          console.log('旧实例清理完成');
+          //console.log('旧实例清理完成');
         }
 
         // 阶段2: 准备新实例
@@ -100,12 +100,12 @@ const MindmapMode = ({ data, lastUpdated, onRefresh }) => {
 }, [data, lastUpdated]); // 仅在data变化时触发
 
   const handleRefresh = async () => {
-    console.log("开始本地刷新...");
+    //console.log("开始本地刷新...");
       setLoading(true);
       setError(null);
       try {
         onRefresh();
-        console.log("主刷新完成")
+        //console.log("主刷新完成")
       } finally {
       setLoading(false);
     }

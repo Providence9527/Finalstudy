@@ -1,4 +1,3 @@
-// NoteMode.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '@mui/material/Button';
@@ -6,6 +5,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import DialogContentText from '@mui/material/DialogContentText';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import { fetchNodeList, deleteNote, createNote } from '../api/learning';
@@ -19,43 +19,59 @@ const NoteMode = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hoveredNoteId, setHoveredNoteId] = useState(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const loadNotes = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchNodeList(user.userId);
+      setNotes(data);
+    } catch (error) {
+      setError('无法加载笔记列表');
+      console.error('加载笔记失败:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadNotes = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchNodeList(user.userId);
-        setNotes(data);
-      } catch (error) {
-        setError('无法加载笔记列表');
-        console.error('加载笔记失败:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     loadNotes();
   }, [user.userId]);
 
-  const handleDelete = async (noteId) => {
+  const handleDelete = async () => {
+    if (!noteToDelete) return;
+    
     try {
-      await deleteNote(user.userId, noteId);
-      setNotes(prev => prev.filter(note => note.id !== noteId));
+      setDeleteLoading(true);
+      await deleteNote(user.userId, noteToDelete);
+      setNotes(prev => prev.filter(note => note.id !== noteToDelete));
+      setConfirmDeleteOpen(false);
     } catch (error) {
       console.error('删除笔记失败:', error);
+      setError('删除失败，请稍后重试');
+    } finally {
+      setDeleteLoading(false);
+      setNoteToDelete(null);
     }
+  };
+
+  const handleDeleteClick = (noteId) => {
+    setNoteToDelete(noteId);
+    setConfirmDeleteOpen(true);
   };
 
   const handleCreate = async () => {
     try {
       setLoading(true);
       const newNote = await createNote(user.userId, newNoteTitle);
-      // 跳转到Notepad组件（待实现）
-      console.log('进入新笔记:', newNote);
       setIsDialogOpen(false);
       setNewNoteTitle('');
+      await loadNotes();
     } catch (error) {
       console.error('创建笔记失败:', error);
+      setError('创建失败，请检查网络连接');
     } finally {
       setLoading(false);
     }
@@ -69,6 +85,8 @@ const NoteMode = () => {
           variant="contained" 
           color="primary"
           onClick={() => setIsDialogOpen(true)}
+          disabled={loading}
+          size="medium"
         >
           新建笔记
         </Button>
@@ -88,7 +106,9 @@ const NoteMode = () => {
             {hoveredNoteId === note.id && (
               <button 
                 className="delete-btn"
-                onClick={() => handleDelete(note.id)}
+                onClick={() => handleDeleteClick(note.id)}
+                disabled={deleteLoading}
+                aria-label="删除笔记"
               >
                 ×
               </button>
@@ -97,10 +117,61 @@ const NoteMode = () => {
         ))}
       </ul>
 
-      {/* 新建笔记弹窗 */}
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-        <DialogTitle>新建笔记</DialogTitle>
+      {/* 删除确认弹窗 */}
+      <Dialog
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        maxWidth="xs"
+        PaperProps={{
+          style: {
+            width: '60vw',
+            maxWidth: 400,
+            borderRadius: 12
+          }
+        }}
+      >
+        <DialogTitle style={{ textAlign: 'center' }}>确认删除</DialogTitle>
         <DialogContent>
+          <DialogContentText style={{ textAlign: 'center' }}>
+            确定要永久删除该笔记吗？此操作无法撤销。
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions style={{ padding: '16px 24px' }}>
+          <Button 
+            onClick={() => setConfirmDeleteOpen(false)}
+            color="primary"
+            disabled={deleteLoading}
+            variant="outlined"
+          >
+            取消
+          </Button>
+          <Button 
+            onClick={handleDelete}
+            color="secondary"
+            variant="contained"
+            disabled={deleteLoading}
+            startIcon={deleteLoading && <CircularProgress size={20} />}
+          >
+            {deleteLoading ? '删除中...' : '确认删除'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 新建笔记弹窗 */}
+      <Dialog 
+        open={isDialogOpen} 
+        onClose={() => setIsDialogOpen(false)}
+        maxWidth="sm"
+        PaperProps={{
+          style: {
+            width: '60vw',
+            maxWidth: 600,
+            borderRadius: 12
+          }
+        }}
+      >
+        <DialogTitle style={{ paddingBottom: 8 }}>新建笔记</DialogTitle>
+        <DialogContent style={{ paddingTop: 8 }}>
           <TextField
             autoFocus
             margin="dense"
@@ -108,16 +179,30 @@ const NoteMode = () => {
             fullWidth
             value={newNoteTitle}
             onChange={(e) => setNewNoteTitle(e.target.value)}
+            variant="outlined"
+            disabled={loading}
+            autoComplete="off"
+            inputProps={{
+              maxLength: 50
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsDialogOpen(false)}>取消</Button>
+        <DialogActions style={{ padding: '16px 24px' }}>
+          <Button 
+            onClick={() => setIsDialogOpen(false)}
+            disabled={loading}
+            variant="outlined"
+          >
+            取消
+          </Button>
           <Button 
             onClick={handleCreate}
-            disabled={loading}
+            color="primary"
+            variant="contained"
+            disabled={loading || !newNoteTitle.trim()}
             startIcon={loading && <CircularProgress size={20} />}
           >
-            创建
+            {loading ? '创建中...' : '创建'}
           </Button>
         </DialogActions>
       </Dialog>

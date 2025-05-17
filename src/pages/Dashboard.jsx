@@ -163,7 +163,7 @@ const Dashboard = ({ sidebarCollapsed, setIsSidebarCollapsed }) => {
       // 独立加载每个数据源
       try {
         const statsRes = await fetchLearningStats(user.userId);
-        console.log("已学时长:",statsRes)
+        //console.log("已学时长:",statsRes)
         setStats(statsRes);
       } catch (err) {
         console.error('统计加载失败:', err);

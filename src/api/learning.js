@@ -14,7 +14,7 @@ export const fetchLearningStats = async (userId) => {
   if (!response.ok) throw new Error('获取数据失败');
   
   const { data } = await response.json(); // 解构data字段
-  console.log("api取回的学习状态",data)
+  //console.log("api取回的学习状态",data)
   // 安全访问嵌套数据
   return {
     coursesCompleted: data?.completed_courses || 0,
@@ -336,7 +336,7 @@ export const fetchReport = async (userId, period) => {
     
     if (!response.ok) throw new Error('请求失败');
     const { data } = await response.json();
-    console.log("取回报告",data)
+    //console.log("取回报告",data)
     // 转换API响应格式到前端所需结构
     return {
       stats: {
@@ -360,9 +360,12 @@ export const fetchReport = async (userId, period) => {
 // 笔记模式api
 export const fetchNodeList = async (userId) => {
   try {
+    //console.log("通过",userId,"获取笔记列表")
     const response = await fetch(`/api/users/${userId}/notes/`);
     if (!response.ok) throw new Error('请求失败');
     const { data } = await response.json();
+    
+    //console.log("后端返回笔记列表如下:",data)
     return data.map(note => ({
       id: note.note_id,
       title: note.title,
@@ -395,6 +398,7 @@ export const deleteNote = async (userId, noteId) => {
 
 export const createNote = async (userId, title) => {
   try {
+    //console.log(`通过${userId}用${title}创建笔记`)
     const response = await fetch(
       `/api/users/${userId}/notes/`,
       {
@@ -409,7 +413,7 @@ export const createNote = async (userId, title) => {
     return {
       id: data.note_id,
       title: data.title,
-      createdAt: data.created_at
+      createdAt: data.lastViewed
     };
   } catch (error) {
     console.error('创建笔记失败:', error);

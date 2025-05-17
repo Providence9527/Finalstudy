@@ -90,10 +90,10 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
         }, [currentPage]);
 
     const handleRefresh = useCallback(() => {
-          console.log("触发本地刷新，使用缓存数据", {
-            length: markdownDataRef.current?.length,
-            currentPage: currentPageRef.current
-          });
+          // console.log("触发本地刷新，使用缓存数据", {
+          //   length: markdownDataRef.current?.length,
+          //   currentPage: currentPageRef.current
+          // });
           setLastUpdated(prev => {
             const newTimestamp = Date.now();
             console.log("生成新时间戳:", newTimestamp);
@@ -105,14 +105,14 @@ const SmartAssistant = ({ documentUrl, currentPage }) => {
       try {
       setLoading(true);
       //console.log("触发取回md前")
-      console.log("正在请求数据...", { documentUrl, currentPage });
+      //console.log("正在请求数据...", { documentUrl, currentPage });
       
       const userId = user.userId;
-      console.log("用户ID",userId);
+      //console.log("用户ID",userId);
       const data = await fetchCurrentMarkdown({documentUrl, currentPage,userId});
-      console.log("[api返回]",data.length);
+      //console.log("[api返回]",data.length);
       setMarkdownData(data || mockData);
-      console.log("[api设置的md]",markdownData.length)
+      //console.log("[api设置的md]",markdownData.length)
       setLastUpdated(Date.now());
       } catch (error) {
         console.error("数据加载失败:", error);
