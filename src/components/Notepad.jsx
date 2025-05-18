@@ -15,6 +15,7 @@ const Notepad = ({ content, onSave, onClose, title }) => {
   const [isSaved, setIsSaved] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const textareaRef = React.useRef(null);
+  const editorContentRef = React.useRef(content);
 
   useEffect(() => {
     setEditorContent(content);
@@ -23,6 +24,7 @@ const Notepad = ({ content, onSave, onClose, title }) => {
 
   const handleContentChange = (e) => {
     if (isSaved) setIsSaved(false);
+    editorContentRef.current = e.target.value; 
     setEditorContent(e.target.value);
   };
 
@@ -30,10 +32,17 @@ const Notepad = ({ content, onSave, onClose, title }) => {
     try {
       setIsSaving(true);
       await onSave(editorContent);
+      editorContentRef.current = editorContent;
       setIsSaved(true);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // 正确的关闭处理逻辑
+  const handleCloseClick = () => {
+    const hasChanges = editorContent !== content;
+    onClose(hasChanges, editorContent);
   };
 
   return (
@@ -72,7 +81,7 @@ const Notepad = ({ content, onSave, onClose, title }) => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <span style={{ marginRight: 16 }}>{title}</span>
           <IconButton 
-            onClick={() => onClose(!isSaved)}
+            onClick={handleCloseClick}
             aria-label="关闭"
           >
             <CloseIcon />

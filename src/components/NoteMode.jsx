@@ -112,9 +112,9 @@ const NoteMode = () => {
   };
 
   // 处理关闭notepad
-  const handleCloseNotepad = (hasUnsavedChanges) => {
+  const handleCloseNotepad = (hasUnsavedChanges, currentContent) => {
     if (hasUnsavedChanges) {
-      setTempContent(selectedNote.content);
+      setTempContent(currentContent);
       setShowSaveConfirm(true);
     } else {
       setSelectedNote(null);
@@ -124,7 +124,7 @@ const NoteMode = () => {
   // 确认保存弹窗操作
   const handleConfirmSave = (shouldSave) => {
     if (shouldSave) {
-      handleSaveConfirm(tempContent);
+      handleSaveConfirm(tempContent); 
     }
     setShowSaveConfirm(false);
     setSelectedNote(null);
