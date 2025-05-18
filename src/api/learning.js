@@ -369,7 +369,8 @@ export const fetchNodeList = async (userId) => {
     return data.map(note => ({
       id: note.note_id,
       title: note.title,
-      lastViewed: note.lastViewed
+      lastViewed: note.lastViewed,
+      content: note.content,
     }));
 
   } catch (error) {
@@ -418,6 +419,22 @@ export const createNote = async (userId, title) => {
     };
   } catch (error) {
     console.error('创建笔记失败:', error);
+    throw error;
+  }
+};
+
+
+export const updateNoteContent = async (userId, noteId, content) => {
+  try {
+    const response = await fetch(`/api/users/${userId}/notes/${noteId}/content/`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+    if (!response.ok) throw new Error('保存失败');
+    return await response.json();
+  } catch (error) {
+    console.error('更新笔记内容失败:', error);
     throw error;
   }
 };

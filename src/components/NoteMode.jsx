@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import Notepad,{SaveConfirmDialog} from './Notepad';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -8,7 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContentText from '@mui/material/DialogContentText';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
-import { fetchNodeList, deleteNote, createNote } from '../api/learning';
+import { fetchNodeList, deleteNote, createNote,updateNoteContent } from '../api/learning';
 import './SmartAssistant.css';
 
 const NoteMode = () => {
@@ -22,6 +23,11 @@ const NoteMode = () => {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // notepad相关状态
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [tempContent, setTempContent] = useState(null);
 
   const loadNotes = async () => {
     try {
@@ -87,6 +93,44 @@ const NoteMode = () => {
     }
   };
 
+  // 处理笔记点击
+  const handleNoteClick = (note) => {
+    setSelectedNote(note);
+  };
+
+  // 处理保存确认
+  const handleSaveConfirm = async (content) => {
+    
+    try {
+      await updateNoteContent(user.userId, selectedNote.id, content);
+      setSelectedNote(prev => ({ ...prev, content }));
+      loadNotes(); // 刷新列表更新时间
+    } catch (error) {
+      console.error('保存失败:', error);
+      setError('保存失败，请检查网络连接');
+    }
+  };
+
+  // 处理关闭notepad
+  const handleCloseNotepad = (hasUnsavedChanges) => {
+    if (hasUnsavedChanges) {
+      setTempContent(selectedNote.content);
+      setShowSaveConfirm(true);
+    } else {
+      setSelectedNote(null);
+    }
+  };
+
+  // 确认保存弹窗操作
+  const handleConfirmSave = (shouldSave) => {
+    if (shouldSave) {
+      handleSaveConfirm(tempContent);
+    }
+    setShowSaveConfirm(false);
+    setSelectedNote(null);
+    setTempContent(null);
+  };
+
   return (
     <div className="note-mode-container" 
     >
@@ -106,7 +150,7 @@ const NoteMode = () => {
       {loading && <div className="loading">加载中...</div>}
       {error && <div className="error">{error}</div>}
 
-      <div style={{
+      {!selectedNote && <div style={{
           flex: 1,
           maxHeight: '40vh',
           minHeight: 200,
@@ -117,6 +161,7 @@ const NoteMode = () => {
           <li 
             key={note.id}
             onMouseEnter={() => setHoveredNoteId(note.id)}
+            onClick={() => handleNoteClick(note)}
             onMouseLeave={() => setHoveredNoteId(null)}
           >
             <span className="note-title">{note.title}</span>
@@ -133,7 +178,24 @@ const NoteMode = () => {
           </li>
         ))}
       </ul>
-    </div>
+    </div>}
+
+    {/* Notepad组件 */}
+    {selectedNote && (
+          <Notepad
+            content={selectedNote.content}
+            onSave={handleSaveConfirm}
+            onClose={handleCloseNotepad}
+            title={selectedNote.title}
+          />
+        )}
+  
+        {/* 未保存确认弹窗 */}
+        <SaveConfirmDialog 
+          open={showSaveConfirm}
+          onClose={() => setShowSaveConfirm(false)}
+          onConfirm={handleConfirmSave}
+        />
 
       {/* 删除确认弹窗 */}
       <Dialog
