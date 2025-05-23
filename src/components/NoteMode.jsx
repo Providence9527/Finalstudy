@@ -83,7 +83,12 @@ const NoteMode = () => {
       const newNote = await createNote(user.userId, newNoteTitle);
       setIsDialogOpen(false);
       setNewNoteTitle('');
-      await loadNotes();
+      setNotes(prev => {
+        const updatedNotes = [newNote, ...prev];
+        setSelectedNote(updatedNotes[0]); // 从更新后的数组直接获取最新状态
+        return updatedNotes;
+      });
+
       setError(null);
     } catch (error) {
       console.error('创建笔记失败:', error);
@@ -168,7 +173,10 @@ const NoteMode = () => {
             {hoveredNoteId === note.id && (
               <button 
                 className="delete-btn"
-                onClick={() => handleDeleteClick(note.id)}
+                onClick={(e) => {
+                    e.stopPropagation(); // 阻止事件冒泡
+                    handleDeleteClick(note.id);
+                  }}
                 disabled={deleteLoading}
                 aria-label="删除笔记"
               >

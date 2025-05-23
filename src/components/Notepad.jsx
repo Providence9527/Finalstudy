@@ -1,14 +1,11 @@
-// src/components/Notepad.jsx
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, TextField, Button, CircularProgress } from '@mui/material';
+import { IconButton, TextField, Button, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-
-
 
 const Notepad = ({ content, onSave, onClose, title }) => {
   const [editorContent, setEditorContent] = useState(content);
@@ -30,6 +27,7 @@ const Notepad = ({ content, onSave, onClose, title }) => {
 
   const handleSave = async () => {
     try {
+      console.log("触发保存")
       setIsSaving(true);
       await onSave(editorContent);
       editorContentRef.current = editorContent;
@@ -39,7 +37,6 @@ const Notepad = ({ content, onSave, onClose, title }) => {
     }
   };
 
-  // 正确的关闭处理逻辑
   const handleCloseClick = () => {
     const hasChanges = editorContent !== content;
     onClose(hasChanges, editorContent);
@@ -58,7 +55,6 @@ const Notepad = ({ content, onSave, onClose, title }) => {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      {/* 工具栏 */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -89,39 +85,54 @@ const Notepad = ({ content, onSave, onClose, title }) => {
         </div>
       </div>
 
-      {/* 编辑区域 */}
-      <div style={{ flex: 1, overflow: 'hidden' }}>
+      
         <TextField
           fullWidth
           autoFocus
           multiline
           value={editorContent}
           onChange={handleContentChange}
-          variant="outlined"
+          variant="standard"
           inputRef={textareaRef}
           InputProps={{
             style: {
-              height: '100%',
+              height: '40vh',
               alignItems: 'flex-start',
-              padding: 16,
+              
               fontSize: '14px',
               lineHeight: 1.6,
-              fontFamily: 'Monaco, monospace'
-            }
+              fontFamily: 'Monaco, monospace',
+              whiteSpace: 'pre-wrap',
+              overflowY: 'auto',
+              overflowX: 'auto',
+              border: '1px solidrgb(196, 196, 196)',
+              borderRadius: '4px',
+              transition: 'border-color 0.3s ease',
+              boxSizing: 'border-box'
+            },
+            disableUnderline: true
           }}
-          style={{
-            height: '100%',
-            '& textarea': {
-              resize: 'none'
+          sx={{
+            '& .MuiInputBase-root': {
+              height: '100%',
+              '&:before, &:after': {
+                display: 'none'
+              }
+            },
+            '&:focus-within': {
+              '& .MuiInputBase-input': {
+                border: '2px solid #1976d2',
+                borderRadius: '10px',
+                padding: '15px' // 补偿边框变粗导致的布局变化
+              }
             }
           }}
         />
-      </div>
+      
     </div>
   );
 };
 
-// 保存确认弹窗组件
 const SaveConfirmDialog = ({ open, onClose, onConfirm }) => (
   <Dialog open={open} onClose={onClose}>
     <DialogTitle>未保存的更改</DialogTitle>
@@ -140,4 +151,4 @@ const SaveConfirmDialog = ({ open, onClose, onConfirm }) => (
 );
 
 export default Notepad;
-export { SaveConfirmDialog }; 
+export { SaveConfirmDialog };
