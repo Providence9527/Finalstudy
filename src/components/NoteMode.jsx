@@ -83,12 +83,10 @@ const NoteMode = () => {
       const newNote = await createNote(user.userId, newNoteTitle);
       setIsDialogOpen(false);
       setNewNoteTitle('');
-      setNotes(prev => {
-        const updatedNotes = [newNote, ...prev];
-        setSelectedNote(updatedNotes[0]); // 从更新后的数组直接获取最新状态
-        return updatedNotes;
-      });
 
+      
+      await loadNotes();
+        
       setError(null);
     } catch (error) {
       console.error('创建笔记失败:', error);
