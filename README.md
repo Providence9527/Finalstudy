@@ -101,8 +101,8 @@ graph LR
 
 ### 启动命令  
 ```bash
-后端服务(进入backendprj/backendprj)
-cd backend && pip install -r requirements.txt
+后端服务(进入backendprj)
+cd backendprj && pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8000
 
