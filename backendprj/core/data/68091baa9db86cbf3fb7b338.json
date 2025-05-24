@@ -1,0 +1,93 @@
+{
+  "nodes": [
+    {
+      "id": "c_io_caching",
+      "name": "C库的I/O缓存机制",
+      "group": "io_management"
+    },
+    {
+      "id": "full_buffering",
+      "name": "全缓存",
+      "group": "io_management",
+      "properties": [
+        "用于磁盘文件访问",
+        "缓冲区满或flush时写入内核"
+      ]
+    },
+    {
+      "id": "line_buffering",
+      "name": "行缓存",
+      "group": "io_management",
+      "properties": [
+        "用于终端访问",
+        "遇换行符触发I/O",
+        "固定大小缓冲区"
+      ]
+    },
+    {
+      "id": "no_buffering",
+      "name": "无缓存",
+      "group": "io_management",
+      "properties": [
+        "直接触发实际I/O操作"
+      ]
+    },
+    {
+      "id": "setbuf",
+      "name": "setbuf函数",
+      "group": "io_api",
+      "properties": [
+        "设置流缓冲区"
+      ]
+    },
+    {
+      "id": "setvbuf",
+      "name": "setvbuf函数",
+      "group": "io_api",
+      "properties": [
+        "自定义缓冲区模式"
+      ]
+    },
+    {
+      "id": "fork_io_example",
+      "name": "fork引发的I/O趣题",
+      "group": "process_management",
+      "properties": [
+        "printf缓冲区行为",
+        "父子进程输出顺序"
+      ]
+    }
+  ],
+  "links": [
+    {
+      "source": "c_io_caching",
+      "target": "full_buffering",
+      "type": "has_mechanism"
+    },
+    {
+      "source": "c_io_caching",
+      "target": "line_buffering",
+      "type": "has_mechanism"
+    },
+    {
+      "source": "c_io_caching",
+      "target": "no_buffering",
+      "type": "has_mechanism"
+    },
+    {
+      "source": "c_io_caching",
+      "target": "setbuf",
+      "type": "uses_api"
+    },
+    {
+      "source": "c_io_caching",
+      "target": "setvbuf",
+      "type": "uses_api"
+    },
+    {
+      "source": "fork_io_example",
+      "target": "c_io_caching",
+      "type": "demonstrates"
+    }
+  ]
+}

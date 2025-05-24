@@ -228,12 +228,8 @@ def save_reading_progress(request):
             recent_views[existing_index]['last_viewed'] = update_time
             recent_views[existing_index]['progress'] = current_record['progress']
         else:
-            # 计算插入位置（循环队列逻辑）
-            #print("/n/n/n")
-            #print("最近插入位置")
             insert_pos = (pos+1) % 5
-            #print(data.get('title', '未命名文档'),"插入位置---->",insert_pos)
-            #print("/n/n/n")
+
             # 覆盖或追加
             if len(recent_views) >= 5:
                 print("插入到",insert_pos)
@@ -244,12 +240,7 @@ def save_reading_progress(request):
         # 保持最多5条记录
         recent_views = recent_views[:5]
 
-        # 构建完整更新文档
-        # new_doc = {
-        #     'user_id': user_id,
-        #     'recent_views': recent_views,
-        #     'latest': current_record
-        # }
+
         print("待更新数据 recent_views",recent_views)
         print("待更新数据 latest",current_record)
 
@@ -286,7 +277,7 @@ def save_reading_progress(request):
   
 def update_graph(userId, book_info):
     """异步保存用户图谱数据"""
-    print(f"[{datetime.now()}] 开始处理用户 {userId} 图谱更新")
+    #print(f"[{datetime.now()}] 开始处理用户 {userId} 图谱更新")
     mongo = None
     try:
         # 1. 提取核心数据并验证
@@ -309,7 +300,7 @@ def update_graph(userId, book_info):
                 fcntl.flock(f, fcntl.LOCK_EX)
                 try:
                     original_content = f.read()
-                    print("\n\n\nupdate_graph函数中更新图谱前读取save_current_graph已写数据:\n",original_content)
+                    #print("\n\n\nupdate_graph函数中更新图谱前读取save_current_graph已写数据:\n",original_content)
                     # 创建备份副本用于错误恢复
                     backup_content = original_content  
                 finally:
@@ -369,7 +360,7 @@ def update_graph(userId, book_info):
             {'$set': updates},
             upsert=True
         )
-        print(f"数据库更新结果：匹配{update_result.matched_count}条，修改{update_result.modified_count}条")
+        #print(f"数据库更新结果：匹配{update_result.matched_count}条，修改{update_result.modified_count}条")
 
         # 9. 安全清空本地文件（操作前验证）
         if os.path.exists(file_path):

@@ -34,16 +34,33 @@ def save_current_graph(text,user_id):
         if not os.path.exists(file_path):
             fd = os.open(file_path, os.O_CREAT | os.O_WRONLY, 0o664) 
             os.close(fd)
-                 
+       
+       
+        test_data = {
+              "original_text": text,
+              "generated_md": KG_result
+          }
+        test_path = "/home/admin/backend/backendprj/core/data/KG_test.json"
+        with open(test_path, 'a', encoding='utf-8') as test_file:
+              json.dump(test_data, test_file, ensure_ascii=False)
+              test_file.write('\n')  # 换行分隔每条记录
+        print("测试数据已保存至KG_test.js")
 
         append_json_to_file(KG_result, file_path)
         print("后台存储成功")
+        
+        # 测试数据保存
+        
+        
     except Exception as e:
         print(f"后台任务保存失败: {str(e)}")
     finally:
         del KGman  # 清理资源
 
 def get_current_markdown(request):
+    
+    
+    
     MPman = SparkAgent(MP_role_prompt,MP_action_prompt)
     user_id = request.headers.get('X-User-Id', '') 
     # print(f"当前用户ID: {user_id}")  
@@ -68,11 +85,22 @@ def get_current_markdown(request):
 
 
     try:
-        print("提取文本:",text)
+        #print("提取文本:",text) 
         final_result = MPman.ask_spark_ai(text)
         # print("取回回答",final_result)
+        
+        # test_data = {
+        #       "original_text": text,
+        #       "generated_md": final_result
+        #   }
+        # test_path = "/home/admin/backend/backendprj/core/data/MD_test.json"
+        # with open(test_path, 'a', encoding='utf-8') as test_file:
+        #       json.dump(test_data, test_file, ensure_ascii=False)
+        #       test_file.write('\n')  # 换行分隔每条记录
+        # print("测试数据已保存至MD_test.js")
+        
         threading.Thread(target=save_current_graph, args=(text,user_id), daemon=True).start()
-        print("已启动后台处理线程")
+        # print("已启动后台处理线程")
         
         return JsonResponse({
             "data": {

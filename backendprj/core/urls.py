@@ -7,7 +7,8 @@ from core.views import (  # 使用绝对路径导入
     conversation_views,
     book_views,
     shelf_views,
-    current_views
+    current_views,
+    mode_views 
     
 )
 
@@ -113,4 +114,10 @@ urlpatterns = [
         current_views.get_current_markdown,
         name='current-markdown'
     ),
+    
+    # 笔记模式接口
+    path('users/<str:user_id>/notes/', mode_views.notes_operation, name='user-notes'),
+    path('users/<str:user_id>/notes/<str:note_id>/', mode_views.note_detail, name='note-detail'),
+    path('users/<str:user_id>/notes/<str:note_id>/content/', mode_views.update_note_content, name='update-note-content'),
+    
 ]

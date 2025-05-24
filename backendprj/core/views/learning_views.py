@@ -31,7 +31,7 @@ def user_stats(request, user_id):
     try:
         mongo = MongoDBClient.get_instance()
         stats_collection = mongo.get_collection('learning_stats')
-        print("进入获取学习状态函数")
+        #print("进入获取学习状态函数")
         # 使用find_one_and_update实现原子性创建
         stats = stats_collection.find_one_and_update(
             {"user_id": user_id},
@@ -167,7 +167,7 @@ def recommend_courses(request, user_id):
 @require_http_methods(["POST"])
 def track_learning_time(request, user_id):
     """记录用户学习时长"""
-    print("收到更新时请求",request.body,user_id)
+    # print("收到更新时请求",request.body,user_id)
     try:
         # 解析请求数据
         data = json.loads(request.body)
@@ -208,19 +208,19 @@ def track_learning_time(request, user_id):
             upsert=True,
             return_document=True
         )
-        print("查找并更新文档",result)
+        # print("查找并更新学习时长文档",result)
 
         # 计算时间差
         last_update = datetime.fromisoformat(result[last_update_key]).astimezone(pytz.UTC)
-        print("last_update: ",last_update)
+        # print("last_update: ",last_update)
         update_data = {"$set": {last_update_key: current_time.isoformat()}}
-        print("update_data: ",update_data)
+        # print("update_data: ",update_data)
         # 定义时间周期判断
         same_month = current_time.month == last_update.month
         same_week = current_time.isocalendar()[1] == last_update.isocalendar()[1]
         same_day = current_time.date() == last_update.date()
         
-        print("逻辑判断结束")
+        # print("逻辑判断结束")
 
         # 构建重置逻辑
         reset_operations = []
